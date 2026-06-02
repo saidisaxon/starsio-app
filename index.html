@@ -4,38 +4,82 @@
     <meta charset="UTF-8">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; padding: 20px; font-family: sans-serif; }
-        .page { display: none; } .active { display: block; }
-        .status-box { text-align: center; padding: 30px; border: 2px solid #2481cc; border-radius: 20px; }
+        body { background: #0f0f0f; color: white; padding: 15px; font-family: sans-serif; }
+        .page { display: none; }
+        .active { display: block; }
+        button { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 12px; background: #2481cc; color: white; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1c1c1c; color: white; box-sizing: border-box; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div id="main-ui" class="page active">
-        <h1>🌟 Starsio Store</h1>
-        </div>
 
-    <div id="status-page" class="page">
-        <div class="status-box" id="status-content">
-            <h3>⏳ To'lovingiz qabul qilindi.</h3>
-            <p>Admin tasdiqlashini kuting...</p>
-        </div>
+    <div id="main" class="page active">
+        <h1>🌟 Starsio Store</h1>
+        <button onclick="showPage('premium')">💎 Telegram Premium</button>
+        <button onclick="showPage('gift-premium')">🎁 Gift Premium</button>
+        <button onclick="showPage('stars')">⭐ Telegram Stars</button>
+        <button onclick="showPage('gifts')">🐸 Telegram Gifts</button>
+        <button onclick="showPage('yordam')">👮‍♂️ Yordam</button>
+    </div>
+
+    <div id="premium" class="page">
+        <h3>💎 Telegram Premium</h3>
+        <button onclick="pay('Premium 1 oy', 41990)">1 oy - 41.990 so'm</button>
+        <button onclick="pay('Premium 12 oy', 294990)">12 oy - 294.990 so'm</button>
+        <button onclick="showPage('main')">⬅️ Orqaga</button>
+    </div>
+
+    <div id="gift-premium" class="page">
+        <h3>🎁 Gift Premium</h3>
+        <input type="text" id="user-gift" placeholder="Username kiriting">
+        <button onclick="fillSelf('user-gift')">👤 O'zim uchun</button>
+        <button onclick="pay('Gift Premium 3 oy', 165990)">3 oy - 165.990 so'm</button>
+        <button onclick="pay('Gift Premium 6 oy', 224990)">6 oy - 224.990 so'm</button>
+        <button onclick="pay('Gift Premium 12 oy', 394990)">12 oy - 394.990 so'm</button>
+        <button onclick="showPage('main')">⬅️ Orqaga</button>
+    </div>
+
+    <div id="stars" class="page">
+        <h3>⭐ Telegram Stars</h3>
+        <input type="text" id="user-stars" placeholder="Username kiriting">
+        <button onclick="fillSelf('user-stars')">👤 O'zim uchun</button>
+        <button onclick="pay('50 Stars', 11500)">⭐ 50 - 11.500 so'm</button>
+        <button onclick="pay('100 Stars', 23000)">⭐ 100 - 23.000 so'm</button>
+        <button onclick="pay('200 Stars', 46000)">⭐ 200 - 46.000 so'm</button>
+        <input type="number" id="qty" placeholder="Miqdorni qo'lda kiritish (1 star=230s)" oninput="calc()">
+        <button id="calc-btn" style="display:none"></button>
+        <button onclick="showPage('main')">⬅️ Orqaga</button>
+    </div>
+
+    <div id="gifts" class="page">
+        <h3>🐸 Telegram Gifts</h3>
+        <p>Xizmat tez orada ishga tushiriladi!</p>
+        <button onclick="showPage('main')">⬅️ Orqaga</button>
+    </div>
+
+    <div id="yordam" class="page">
+        <h3>👮‍♂️ Yordam</h3>
+        <button onclick="window.open('https://t.me/saiduz', '_blank')">💬 Supportga yozish</button>
+        <button onclick="showPage('main')">⬅️ Orqaga</button>
+    </div>
+
+    <div id="pay-page" class="page">
+        <h3>To'lov</h3>
+        <p>Karta: <b>5614 6828 8568 7642</b></p>
+        <button onclick="copyCard()">📋 Nusxalash</button>
+        <input type="file" id="receipt-file">
+        <button onclick="sendDataToBot()">✅ Chekni yuborish</button>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        
-        // Admin tasdiqlaganida Mini App xabar oladi
-        tg.onEvent('mainButton', () => {}); 
-        
-        function submitReceipt() {
-            showPage('status-page');
-            tg.sendData("CHECK_SENT"); // Botga chek yuborilganini bildirish
-        }
-        
-        // Botdan "TASDIQLANDI" degan signal kelsa, buni ilovada ko'rsatamiz
-        // Buni amalga oshirish uchun Python bot 'web_app_data' emas, 
-        // 'MainButton' yoki custom eventlardan foydalanish kerak.
+        let tg = window.Telegram.WebApp; tg.expand();
+        let selectedItem = "";
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function fillSelf(id) { document.getElementById(id).value = tg.initDataUnsafe.user.username; }
+        function pay(name, price) { selectedItem = name + " (" + price + " so'm)"; showPage('pay-page'); }
+        function calc() { let q = document.getElementById('qty').value; document.getElementById('calc-btn').innerText = q + " Stars - " + (q*230) + " so'm"; document.getElementById('calc-btn').style.display = 'block'; document.getElementById('calc-btn').onclick = () => pay(q + ' Stars', q*230); }
+        function copyCard() { navigator.clipboard.writeText("5614682885687642"); alert("Karta raqami nusxalandi!"); }
+        function sendDataToBot() { tg.sendData(selectedItem); document.body.innerHTML = "<h3>To'lovingiz qayta ishlashga yuborildi. Admin tasdiqlashini kuting!</h3>"; }
     </script>
 </body>
 </html>
