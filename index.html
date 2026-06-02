@@ -6,16 +6,30 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-blue: #2481cc; --bg: #0f0f0f; }
-        body { background: var(--bg); color: white; padding: 15px; font-family: sans-serif; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #1c1c1c; 
-                 color: var(--tg-blue); font-weight: bold; border: 1px solid var(--tg-blue); }
-        .page { display: none; } .active { display: block; }
+        body { background: var(--bg); color: white; padding: 15px; font-family: -apple-system, sans-serif; }
+        
+        h1 { color: var(--tg-blue); text-align: center; margin-bottom: 20px; }
+        
+        /* 2 qatorli ixcham grid */
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 10px;
+        }
+
+        button { 
+            width: 100%; padding: 15px 5px; border: none; border-radius: 12px; 
+            background: #1c1c1c; color: var(--tg-blue); font-weight: bold; 
+            font-size: 14px; border: 1px solid var(--tg-blue); cursor: pointer;
+        }
+        button:active { background: var(--tg-blue); color: white; }
     </style>
 </head>
 <body>
-    <div id="main" class="page active">
-        <h1 style="color:var(--tg-blue); text-align:center;">🌟 Starsio Store</h1>
+
+    <div id="main">
+        <h1>🌟 Starsio Store</h1>
         <div class="menu-grid">
             <button onclick="pay('Premium 1 oy', 41990)">💎 Prem 1 oy</button>
             <button onclick="pay('Premium 12 oy', 294990)">💎 Prem 12 oy</button>
@@ -23,9 +37,16 @@
             <button onclick="pay('100 Stars', 23000)">⭐ 100 Stars</button>
         </div>
     </div>
+
     <script>
-        let tg = window.Telegram.WebApp; tg.expand();
-        function pay(item, price) { tg.sendData(item + " - " + price + " so'm"); }
+        let tg = window.Telegram.WebApp; 
+        tg.expand(); 
+        tg.setBackgroundColor("#0f0f0f");
+
+        function pay(item, price) { 
+            // Buyurtmani botga yuborish
+            tg.sendData(item + " (" + price + " so'm)"); 
+        }
     </script>
 </body>
 </html>
