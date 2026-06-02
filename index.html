@@ -1,7 +1,31 @@
-echo "# starsio-app" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/saidisaxon/starsio-app.git
-git push -u origin main
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starsio Store</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
+        .card { background: white; padding: 15px; margin: 10px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; background: #2481cc; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🛒 Starsio Xizmatlari</h1>
+    <div class="card">
+        <h3>Telegram Premium</h3>
+        <button onclick="tg.sendData('Premium_1_oy')">1 oy - 41.990 so'm</button>
+        <button onclick="tg.sendData('Premium_12_oy')">12 oy - 294.990 so'm</button>
+    </div>
+    <div class="card">
+        <h3>Telegram Stars</h3>
+        <button onclick="tg.sendData('Stars_50')">50 Stars - 11.500 so'm</button>
+        <button onclick="tg.sendData('Stars_100')">100 Stars - 23.000 so'm</button>
+    </div>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+    </script>
+</body>
+</html>
