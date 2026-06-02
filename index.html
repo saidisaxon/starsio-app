@@ -2,31 +2,55 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; padding: 15px; font-family: sans-serif; }
-        .page { display: none; }
+        :root { --tg-blue: #2481cc; --bg: #0f0f0f; }
+        body { background: var(--bg); color: white; padding: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        h1, h3 { color: var(--tg-blue); text-align: center; margin-bottom: 20px; }
+        
+        /* 2 qatorli grid menyu */
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 10px;
+        }
+
+        button { 
+            width: 100%; padding: 12px 5px; border: none; border-radius: 10px; 
+            background: #1c1c1c; color: var(--tg-blue); font-weight: bold; 
+            font-size: 13px; border: 1px solid var(--tg-blue); cursor: pointer;
+            transition: 0.2s;
+        }
+        button:active { background: var(--tg-blue); color: white; }
+        
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1c1c1c; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        
+        .page { display: none; } 
         .active { display: block; }
-        button { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 12px; background: #2481cc; color: white; font-weight: bold; cursor: pointer; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1c1c1c; color: white; box-sizing: border-box; margin-bottom: 10px; }
+        .back-btn { margin-top: 20px; background: #333; border: none; color: white; }
     </style>
 </head>
 <body>
 
     <div id="main" class="page active">
         <h1>🌟 Starsio Store</h1>
-        <button onclick="showPage('premium')">💎 Telegram Premium</button>
-        <button onclick="showPage('gift-premium')">🎁 Gift Premium</button>
-        <button onclick="showPage('stars')">⭐ Telegram Stars</button>
-        <button onclick="showPage('gifts')">🐸 Telegram Gifts</button>
-        <button onclick="showPage('yordam')">👮‍♂️ Yordam</button>
+        <div class="menu-grid">
+            <button onclick="showPage('premium')">💎 Premium</button>
+            <button onclick="showPage('gift-premium')">🎁 Gift Premium</button>
+            <button onclick="showPage('stars')">⭐ Stars</button>
+            <button onclick="showPage('gifts')">🐸 Gifts</button>
+            <button style="grid-column: span 2;" onclick="showPage('yordam')">👮‍♂️ Yordam</button>
+        </div>
     </div>
 
     <div id="premium" class="page">
         <h3>💎 Telegram Premium</h3>
         <button onclick="pay('Premium 1 oy', 41990)">1 oy - 41.990 so'm</button>
         <button onclick="pay('Premium 12 oy', 294990)">12 oy - 294.990 so'm</button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
+        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
     </div>
 
     <div id="gift-premium" class="page">
@@ -34,52 +58,38 @@
         <input type="text" id="user-gift" placeholder="Username kiriting">
         <button onclick="fillSelf('user-gift')">👤 O'zim uchun</button>
         <button onclick="pay('Gift Premium 3 oy', 165990)">3 oy - 165.990 so'm</button>
-        <button onclick="pay('Gift Premium 6 oy', 224990)">6 oy - 224.990 so'm</button>
         <button onclick="pay('Gift Premium 12 oy', 394990)">12 oy - 394.990 so'm</button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
+        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
     </div>
 
     <div id="stars" class="page">
         <h3>⭐ Telegram Stars</h3>
         <input type="text" id="user-stars" placeholder="Username kiriting">
         <button onclick="fillSelf('user-stars')">👤 O'zim uchun</button>
-        <button onclick="pay('50 Stars', 11500)">⭐ 50 - 11.500 so'm</button>
-        <button onclick="pay('100 Stars', 23000)">⭐ 100 - 23.000 so'm</button>
-        <button onclick="pay('200 Stars', 46000)">⭐ 200 - 46.000 so'm</button>
-        <input type="number" id="qty" placeholder="Miqdorni qo'lda kiritish (1 star=230s)" oninput="calc()">
-        <button id="calc-btn" style="display:none"></button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
+        <button onclick="pay('50 Stars', 11500)">⭐ 50 - 11.500</button>
+        <button onclick="pay('100 Stars', 23000)">⭐ 100 - 23.000</button>
+        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
     </div>
 
-    <div id="gifts" class="page">
-        <h3>🐸 Telegram Gifts</h3>
-        <p>Xizmat tez orada ishga tushiriladi!</p>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
-    <div id="yordam" class="page">
-        <h3>👮‍♂️ Yordam</h3>
-        <button onclick="window.open('https://t.me/saiduz', '_blank')">💬 Supportga yozish</button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
+    <div id="gifts" class="page"><h3>🐸 Telegram Gifts</h3><p style="text-align:center">Tez orada ishga tushiriladi!</p><button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button></div>
+    <div id="yordam" class="page"><h3>👮‍♂️ Yordam</h3><button onclick="window.open('https://t.me/saiduz', '_blank')">💬 Supportga yozish</button><button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button></div>
 
     <div id="pay-page" class="page">
         <h3>To'lov</h3>
-        <p>Karta: <b>5614 6828 8568 7642</b></p>
-        <button onclick="copyCard()">📋 Nusxalash</button>
-        <input type="file" id="receipt-file">
-        <button onclick="sendDataToBot()">✅ Chekni yuborish</button>
+        <div style="background:#1c1c1c; padding:15px; border-radius:10px; text-align:center;">
+            <p>Karta: <br><b>5614 6828 8568 7642</b></p>
+            <button onclick="navigator.clipboard.writeText('5614682885687642'); alert('Nusxalandi!')">📋 Nusxalash</button>
+        </div>
+        <input type="file" id="receipt-file" style="margin-top:15px">
+        <button style="background:var(--tg-blue); color:white;" onclick="tg.sendData(selectedItem)">✅ Chekni yuborish</button>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp; tg.expand();
+        let tg = window.Telegram.WebApp; tg.expand(); tg.setBackgroundColor("#0f0f0f");
         let selectedItem = "";
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function fillSelf(id) { document.getElementById(id).value = tg.initDataUnsafe.user.username; }
         function pay(name, price) { selectedItem = name + " (" + price + " so'm)"; showPage('pay-page'); }
-        function calc() { let q = document.getElementById('qty').value; document.getElementById('calc-btn').innerText = q + " Stars - " + (q*230) + " so'm"; document.getElementById('calc-btn').style.display = 'block'; document.getElementById('calc-btn').onclick = () => pay(q + ' Stars', q*230); }
-        function copyCard() { navigator.clipboard.writeText("5614682885687642"); alert("Karta raqami nusxalandi!"); }
-        function sendDataToBot() { tg.sendData(selectedItem); document.body.innerHTML = "<h3>To'lovingiz qayta ishlashga yuborildi. Admin tasdiqlashini kuting!</h3>"; }
     </script>
 </body>
 </html>
