@@ -6,90 +6,26 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-blue: #2481cc; --bg: #0f0f0f; }
-        body { background: var(--bg); color: white; padding: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        h1, h3 { color: var(--tg-blue); text-align: center; margin-bottom: 20px; }
-        
-        /* 2 qatorli grid menyu */
-        .menu-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            margin-top: 10px;
-        }
-
-        button { 
-            width: 100%; padding: 12px 5px; border: none; border-radius: 10px; 
-            background: #1c1c1c; color: var(--tg-blue); font-weight: bold; 
-            font-size: 13px; border: 1px solid var(--tg-blue); cursor: pointer;
-            transition: 0.2s;
-        }
-        button:active { background: var(--tg-blue); color: white; }
-        
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1c1c1c; color: white; margin-bottom: 10px; box-sizing: border-box; }
-        
-        .page { display: none; } 
-        .active { display: block; }
-        .back-btn { margin-top: 20px; background: #333; border: none; color: white; }
+        body { background: var(--bg); color: white; padding: 15px; font-family: sans-serif; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #1c1c1c; 
+                 color: var(--tg-blue); font-weight: bold; border: 1px solid var(--tg-blue); }
+        .page { display: none; } .active { display: block; }
     </style>
 </head>
 <body>
-
     <div id="main" class="page active">
-        <h1>🌟 Starsio Store</h1>
+        <h1 style="color:var(--tg-blue); text-align:center;">🌟 Starsio Store</h1>
         <div class="menu-grid">
-            <button onclick="showPage('premium')">💎 Premium</button>
-            <button onclick="showPage('gift-premium')">🎁 Gift Premium</button>
-            <button onclick="showPage('stars')">⭐ Stars</button>
-            <button onclick="showPage('gifts')">🐸 Gifts</button>
-            <button style="grid-column: span 2;" onclick="showPage('yordam')">👮‍♂️ Yordam</button>
+            <button onclick="pay('Premium 1 oy', 41990)">💎 Prem 1 oy</button>
+            <button onclick="pay('Premium 12 oy', 294990)">💎 Prem 12 oy</button>
+            <button onclick="pay('50 Stars', 11500)">⭐ 50 Stars</button>
+            <button onclick="pay('100 Stars', 23000)">⭐ 100 Stars</button>
         </div>
     </div>
-
-    <div id="premium" class="page">
-        <h3>💎 Telegram Premium</h3>
-        <button onclick="pay('Premium 1 oy', 41990)">1 oy - 41.990 so'm</button>
-        <button onclick="pay('Premium 12 oy', 294990)">12 oy - 294.990 so'm</button>
-        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
-    <div id="gift-premium" class="page">
-        <h3>🎁 Gift Premium</h3>
-        <input type="text" id="user-gift" placeholder="Username kiriting">
-        <button onclick="fillSelf('user-gift')">👤 O'zim uchun</button>
-        <button onclick="pay('Gift Premium 3 oy', 165990)">3 oy - 165.990 so'm</button>
-        <button onclick="pay('Gift Premium 12 oy', 394990)">12 oy - 394.990 so'm</button>
-        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
-    <div id="stars" class="page">
-        <h3>⭐ Telegram Stars</h3>
-        <input type="text" id="user-stars" placeholder="Username kiriting">
-        <button onclick="fillSelf('user-stars')">👤 O'zim uchun</button>
-        <button onclick="pay('50 Stars', 11500)">⭐ 50 - 11.500</button>
-        <button onclick="pay('100 Stars', 23000)">⭐ 100 - 23.000</button>
-        <button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
-    <div id="gifts" class="page"><h3>🐸 Telegram Gifts</h3><p style="text-align:center">Tez orada ishga tushiriladi!</p><button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button></div>
-    <div id="yordam" class="page"><h3>👮‍♂️ Yordam</h3><button onclick="window.open('https://t.me/saiduz', '_blank')">💬 Supportga yozish</button><button class="back-btn" onclick="showPage('main')">⬅️ Orqaga</button></div>
-
-    <div id="pay-page" class="page">
-        <h3>To'lov</h3>
-        <div style="background:#1c1c1c; padding:15px; border-radius:10px; text-align:center;">
-            <p>Karta: <br><b>5614 6828 8568 7642</b></p>
-            <button onclick="navigator.clipboard.writeText('5614682885687642'); alert('Nusxalandi!')">📋 Nusxalash</button>
-        </div>
-        <input type="file" id="receipt-file" style="margin-top:15px">
-        <button style="background:var(--tg-blue); color:white;" onclick="tg.sendData(selectedItem)">✅ Chekni yuborish</button>
-    </div>
-
     <script>
-        let tg = window.Telegram.WebApp; tg.expand(); tg.setBackgroundColor("#0f0f0f");
-        let selectedItem = "";
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        function fillSelf(id) { document.getElementById(id).value = tg.initDataUnsafe.user.username; }
-        function pay(name, price) { selectedItem = name + " (" + price + " so'm)"; showPage('pay-page'); }
+        let tg = window.Telegram.WebApp; tg.expand();
+        function pay(item, price) { tg.sendData(item + " - " + price + " so'm"); }
     </script>
 </body>
 </html>
