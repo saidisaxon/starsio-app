@@ -2,30 +2,72 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starsio Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
-        .card { background: white; padding: 15px; margin: 10px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; background: #2481cc; color: white; cursor: pointer; }
+        body { font-family: sans-serif; background: #0f0f0f; color: white; padding: 20px; }
+        .page { display: none; } .active { display: block; }
+        button { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; background: #2481cc; color: white; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1c1c1c; color: white; box-sizing: border-box; }
+        .card { background: #1c1c1c; padding: 15px; border-radius: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>🛒 Starsio Xizmatlari</h1>
-    <div class="card">
-        <h3>Telegram Premium</h3>
-        <button onclick="tg.sendData('Premium_1_oy')">1 oy - 41.990 so'm</button>
-        <button onclick="tg.sendData('Premium_12_oy')">12 oy - 294.990 so'm</button>
+    <div id="main" class="page active">
+        <h1>🌟 Starsio Store</h1>
+        <button onclick="showPage('premium')">💎 Telegram Premium</button>
+        <button onclick="showPage('gift-premium')">🎁 Gift Premium</button>
+        <button onclick="showPage('stars')">⭐ Telegram Stars</button>
+        <button onclick="showPage('gifts')">🐸 Telegram Gifts</button>
+        <button onclick="showPage('yordam')">👮‍♂️ Yordam</button>
     </div>
-    <div class="card">
-        <h3>Telegram Stars</h3>
-        <button onclick="tg.sendData('Stars_50')">50 Stars - 11.500 so'm</button>
-        <button onclick="tg.sendData('Stars_100')">100 Stars - 23.000 so'm</button>
+
+    <div id="premium" class="page">
+        <h3>💎 Telegram Premium</h3>
+        <button onclick="pay('Premium 1 oy', 41990)">1 oy - 41.990 so'm</button>
+        <button onclick="pay('Premium 12 oy', 294990)">12 oy - 294.990 so'm</button>
     </div>
+
+    <div id="gift-premium" class="page">
+        <h3>🎁 Gift Premium</h3>
+        <input type="text" id="user-gift" placeholder="Username kiriting">
+        <button onclick="document.getElementById('user-gift').value=tg.initDataUnsafe.user.username">👤 O'zim uchun</button>
+        <button onclick="pay('Gift Premium 3 oy', 165990)">3 oy - 165.990 so'm</button>
+        <button onclick="pay('Gift Premium 6 oy', 224990)">6 oy - 224.990 so'm</button>
+        <button onclick="pay('Gift Premium 12 oy', 394990)">12 oy - 394.990 so'm</button>
+    </div>
+
+    <div id="stars" class="page">
+        <h3>⭐ Telegram Stars</h3>
+        <input type="text" id="user-stars" placeholder="Username kiriting">
+        <button onclick="document.getElementById('user-stars').value=tg.initDataUnsafe.user.username">👤 O'zim uchun</button>
+        <button onclick="pay('50 Stars', 11500)">50 Stars - 11.500</button>
+        <button onclick="pay('100 Stars', 23000)">100 Stars - 23.000</button>
+        <button onclick="pay('200 Stars', 46000)">200 Stars - 46.000</button>
+        <input type="number" id="manual-stars" placeholder="Miqdorni kiriting" oninput="calcStars()">
+        <button id="manual-btn" style="display:none"></button>
+    </div>
+
+    <div id="yordam" class="page">
+        <button onclick="window.location.href='https://t.me/saiduz'">👮‍♂️ Supportga yozish</button>
+    </div>
+
+    <div id="payment-page" class="page">
+        <h3>To'lovni amalga oshiring</h3>
+        <div class="card">
+            <p>Karta: <span id="card-text">5614 6828 8568 7642</span></p>
+            <button onclick="navigator.clipboard.writeText('5614682885687642')">📋 Karta raqamini nusxalash</button>
+        </div>
+        <input type="file" id="file-input" accept="image/*">
+        <button onclick="sendReceipt()">✅ Chekni yuborish</button>
+    </div>
+
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        let tg = window.Telegram.WebApp; tg.expand();
+        let selectedItem = "";
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function pay(name, price) { selectedItem = name + " (" + price + " so'm)"; showPage('payment-page'); }
+        function calcStars() { let qty = document.getElementById('manual-stars').value; let price = qty * 230; document.getElementById('manual-btn').innerText = qty + " Stars - " + price + " so'm"; document.getElementById('manual-btn').style.display = 'block'; document.getElementById('manual-btn').onclick = () => pay(qty + ' Stars', price); }
+        function sendReceipt() { tg.sendData(selectedItem + " uchun chek yuklandi"); document.body.innerHTML = "<h3>To'lovingiz qayta ishlashga yuborildi. Admin tasdiqlashini kuting!</h3>"; }
     </script>
 </body>
 </html>
