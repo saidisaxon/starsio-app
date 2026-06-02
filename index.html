@@ -7,48 +7,25 @@
     <style>
         :root { --tg-blue: #2481cc; --bg: #0f0f0f; }
         body { background: var(--bg); color: white; padding: 15px; font-family: sans-serif; }
-        
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        button { width: 100%; padding: 12px 5px; border: none; border-radius: 10px; background: #1c1c1c; 
-                 color: var(--tg-blue); font-weight: bold; border: 1px solid var(--tg-blue); cursor: pointer; }
-        
-        .page { display: none; } .active { display: block; }
         h1, h3 { color: var(--tg-blue); text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #1c1c1c; color: white; box-sizing: border-box; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { width: 100%; padding: 15px 5px; border: none; border-radius: 10px; background: #1c1c1c; 
+                 color: var(--tg-blue); font-weight: bold; border: 1px solid var(--tg-blue); cursor: pointer; }
+        .page { display: none; } .active { display: block; }
     </style>
 </head>
 <body>
-
     <div id="main" class="page active">
         <h1>🌟 Starsio Store</h1>
         <div class="menu-grid">
-            <button onclick="showPage('premium')">💎 Premium</button>
-            <button onclick="showPage('gift')">🎁 Gift</button>
-            <button onclick="showPage('stars')">⭐ Stars</button>
-            <button onclick="showPage('yordam')">👮‍♂️ Yordam</button>
+            <button onclick="tg.sendData('Premium')">💎 Premium</button>
+            <button onclick="tg.sendData('Gift')">🎁 Gift</button>
+            <button onclick="tg.sendData('Stars')">⭐ Stars</button>
+            <button onclick="window.open('https://t.me/saiduz', '_blank')">👮‍♂️ Yordam</button>
         </div>
     </div>
-
-    <div id="premium" class="page">
-        <h3>💎 Premium</h3>
-        <button onclick="pay('Prem 1 oy')">1 oy - 41.990</button>
-        <button onclick="pay('Prem 12 oy')">12 oy - 294.990</button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
-    <div id="yordam" class="page">
-        <h3>👮‍♂️ Yordam</h3>
-        <button onclick="window.open('https://t.me/saiduz', '_blank')">Aloqa</button>
-        <button onclick="showPage('main')">⬅️ Orqaga</button>
-    </div>
-
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        function showPage(id) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-        function pay(item) { tg.sendData(item); }
     </script>
 </body>
 </html>
