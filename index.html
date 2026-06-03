@@ -2,224 +2,433 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Stars & Premium Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { background-color: #0b0e14; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .ios-card { background-color: #161f2c; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); }
-        .ios-btn { background-color: #007AFF; color: #ffffff; border-radius: 12px; transition: all 0.2s ease; }
-        .ios-btn:active { opacity: 0.8; transform: scale(0.98); }
+        :root {
+            --bg-color: #f2f2f7;
+            --surface-color: #ffffff;
+            --text-color: #000000;
+            --text-secondary: #8e8e93;
+            --primary-color: #007aff;
+            --border-color: #c6c6c8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #e3e3e9;
+            padding: 2px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: var(--surface-color);
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Windows & Navigation */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        .ios-list {
+            background: var(--surface-color);
+            border-radius: 10px;
+            padding: 0;
+            margin: 0 0 20px 0;
+            list-style: none;
+            overflow: hidden;
+        }
+        .ios-item {
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid var(--border-color);
+            cursor: pointer;
+        }
+        .ios-item:last-child { border-bottom: none; }
+        .ios-item:active { background-color: #e5e5ea; }
+
+        /* Inputs & Buttons */
+        .input-group {
+            display: flex;
+            background: var(--surface-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .ios-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 16px;
+        }
+        .inline-btn {
+            background: #e1f0ff;
+            color: var(--primary-color);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .ios-btn {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .ios-btn:active { opacity: 0.8; }
+        
+        .back-btn {
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Status & Details styling */
+        .card-details {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .status-box {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .file-label {
+            display: block;
+            background: #f2f2f7;
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
-<body class="p-4 antialiased select-none">
+<body>
 
-    <div id="menu-page" class="space-y-6">
-        <div class="text-center py-2">
-            <h1 class="text-2xl font-bold tracking-tight text-gray-100">Asosiy Menu</h1>
-            <p class="text-xs text-gray-400 mt-1">Sifatli va tezkor xizmatlar</p>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4">
-            <button onclick="openPage('stars-page')" class="ios-card p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl">
-                <span class="text-3xl">⭐</span>
-                <span class="font-semibold text-sm text-gray-200">Telegram Stars</span>
-            </button>
-            <button onclick="openPage('premium-page')" class="ios-card p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl">
-                <span class="text-3xl">💎</span>
-                <span class="font-semibold text-sm text-gray-200">Telegram Premium</span>
-            </button>
-            <button onclick="openPage('gift-page')" class="ios-card p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl">
-                <span class="text-3xl">🎁</span>
-                <span class="font-semibold text-sm text-gray-200">Gift Premium</span>
-            </button>
-            <button onclick="tg.openTelegramLink('https://t.me/saiduz')" class="ios-card p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl bg-gradient-to-br from-slate-900 to-blue-950/30">
-                <span class="text-3xl">👨🏻‍💻</span>
-                <span class="font-semibold text-sm text-blue-400">Support</span>
-            </button>
-        </div>
+    <div id="main-tabs" class="tabs">
+        <button id="tab-stars" class="tab-btn active" onclick="switchTab('stars')">⭐ Stars</button>
+        <button id="tab-premium" class="tab-btn" onclick="switchTab('premium')">💎 Premium</button>
     </div>
 
-    <div id="stars-page" class="hidden space-y-4">
-        <button onclick="openPage('menu-page')" class="text-sm text-gray-400 font-medium">⬅️ Orqaga</button>
-        <h2 class="text-xl font-bold text-center text-yellow-400">⭐ Telegram Stars</h2>
-        
-        <div class="ios-card p-3 flex items-center gap-2">
-            <input type="text" id="stars-user" placeholder="Stars uchun username kiriting" class="bg-transparent flex-1 p-2 outline-none text-sm text-white">
-            <button onclick="setMe('stars-user')" class="ios-btn text-xs px-3 py-2 font-bold">O'zim uchun</button>
+    <div id="sec-stars" class="screen active">
+        <div class="input-group">
+            <input type="text" id="stars-username" class="ios-input" placeholder="Username kiriting">
+            <button class="inline-btn" onclick="fillOwnUsername('stars-username')">O'zim uchun</button>
         </div>
-
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="buyStars(50, 11000)" class="ios-card p-4 text-center font-bold">50 ⭐<br><span class="text-xs font-normal text-gray-400">11,000 so'm</span></button>
-            <button onclick="buyStars(100, 22000)" class="ios-card p-4 text-center font-bold">100 ⭐<br><span class="text-xs font-normal text-gray-400">22,000 so'm</span></button>
-            <button onclick="buyStars(200, 44000)" class="ios-card p-4 text-center font-bold">200 ⭐<br><span class="text-xs font-normal text-gray-400">44,000 so'm</span></button>
-            <button onclick="showCustomStars()" class="ios-card p-4 text-center font-bold text-sm text-blue-400">✍🏻 Miqdorni qo'lda kiritish</button>
-        </div>
-
-        <div id="custom-stars-block" class="hidden ios-card p-4 space-y-3">
-            <input type="number" id="custom-qty" placeholder="Miqdorni yozing" oninput="calcStars()" class="w-full bg-transparent p-2 border-b border-gray-700 outline-none text-sm">
-            <p id="custom-res" class="text-xs text-green-400 font-medium">Narxi: 0 so'm</p>
-            <button onclick="submitCustomStars()" class="w-full ios-btn py-2.5 font-bold text-sm">Tasdiqlash</button>
-        </div>
+        <ul class="ios-list" id="stars-rates-list"></ul>
     </div>
 
-    <div id="premium-page" class="hidden space-y-4">
-        <button onclick="openPage('menu-page')" class="text-sm text-gray-400 font-medium">⬅️ Orqaga</button>
-        <h2 class="text-xl font-bold text-center text-blue-400">💎 Telegram Premium</h2>
-        
-        <div class="space-y-3">
-            <button onclick="buyPremium('Premium 1 oy', 41990)" class="w-full ios-card p-4 font-bold flex justify-between items-center text-sm">
-                <span>1 oy</span> <span class="text-blue-400">41.990 so'm</span>
-            </button>
-            <button onclick="buyPremium('Premium 12 oy', 294990)" class="w-full ios-card p-4 font-bold flex justify-between items-center text-sm">
-                <span>12 oy</span> <span class="text-blue-400">294.990 so'm</span>
-            </button>
-        </div>
+    <div id="sec-premium" class="screen">
+        <ul class="ios-list">
+            <li class="ios-item" onclick="openPremiumSub('telegram')">
+                <span>💎 Telegram Premium</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </li>
+            <li class="ios-item" onclick="openPremiumSub('gift')">
+                <span>🎁 Gift Premium</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </li>
+        </ul>
     </div>
 
-    <div id="gift-page" class="hidden space-y-4">
-        <button onclick="openPage('menu-page')" class="text-sm text-gray-400 font-medium">⬅️ Orqaga</button>
-        <h2 class="text-xl font-bold text-center text-purple-400">🎁 Gift Premium</h2>
-        
-        <div class="ios-card p-3 flex items-center gap-2">
-            <input type="text" id="gift-user" placeholder="Hadya uchun username" class="bg-transparent flex-1 p-2 outline-none text-sm text-white">
-            <button onclick="setMe('gift-user')" class="ios-btn text-xs px-3 py-2 font-bold">O'zim uchun</button>
-        </div>
-
-        <div class="space-y-3">
-            <button onclick="buyGift('Gift 3 oy', 165990)" class="w-full ios-card p-4 font-bold flex justify-between items-center text-sm">
-                <span>3 oy</span> <span class="text-purple-400">165.990 so'm</span>
-            </button>
-            <button onclick="buyGift('Gift 6 oy', 224990)" class="w-full ios-card p-4 font-bold flex justify-between items-center text-sm">
-                <span>6 oy</span> <span class="text-purple-400">224.990 so'm</span>
-            </button>
-            <button onclick="buyGift('Gift 12 oy', 394990)" class="w-full ios-card p-4 font-bold flex justify-between items-center text-sm">
-                <span>12 oy</span> <span class="text-purple-400">394.990 so'm</span>
-            </button>
-        </div>
+    <div id="sec-premium-telegram" class="screen">
+        <div class="back-btn" onclick="goBack('sec-premium')">‹ Ortga</div>
+        <ul class="ios-list">
+            <li class="ios-item" onclick="selectPremiumOption('Telegram Premium 1 oy', 41990)">
+                <span>1 oy</span><span>41,990 so'm</span>
+            </li>
+            <li class="ios-item" onclick="selectPremiumOption('Telegram Premium 12 oy', 294990)">
+                <span>12 oy</span><span>294,990 so'm</span>
+            </li>
+        </ul>
     </div>
 
-    <div id="pay-page" class="hidden space-y-4">
-        <h2 class="text-lg font-bold text-center text-green-400">To'lov Ma'lumotlari</h2>
-        
-        <div class="ios-card p-4 space-y-3 text-sm">
-            <p id="pay-desc" class="leading-relaxed text-gray-300"></p>
+    <div id="sec-premium-gift" class="screen">
+        <div class="back-btn" onclick="goBack('sec-premium')">‹ Ortga</div>
+        <div class="input-group">
+            <input type="text" id="gift-username" class="ios-input" placeholder="Username kiriting">
+            <button class="inline-btn" onclick="fillOwnUsername('gift-username')">O'zim uchun</button>
+        </div>
+        <ul class="ios-list">
+            <li class="ios-item" onclick="selectGiftOption('Gift Premium 3 oy', 165990)">
+                <span>3 oy</span><span>165,990 so'm</span>
+            </li>
+            <li class="ios-item" onclick="selectGiftOption('Gift Premium 6 oy', 224990)">
+                <span>6 oy</span><span>224,990 so'm</span>
+            </li>
+            <li class="ios-item" onclick="selectGiftOption('Gift Premium 12 oy', 394990)">
+                <span>12 oy</span><span>394,990 so'm</span>
+            </li>
+        </ul>
+    </div>
+
+    <div id="sec-payment" class="screen">
+        <div class="back-btn" id="pay-back-btn">‹ Ortga</div>
+        <div class="card-details">
+            <h3 style="margin-top:0;">To'lov bo'limi</h3>
+            <p id="pay-item-details" style="font-weight:600; color:var(--primary-color);"></p>
+            <div style="font-size:20px; font-weight:bold; margin:15px 0;" id="pay-card-num">5614 6828 8568 7642</div>
+            <button class="inline-btn" onclick="copyCard()">Nusxalash</button>
+            <div style="margin-top:10px; color:var(--text-secondary)" id="pay-card-holder">Matlabov Saidisaxon</div>
             
-            <div class="bg-slate-900/90 p-3 rounded-xl flex justify-between items-center border border-gray-800">
-                <div>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">Karta raqami</p>
-                    <p id="card-num" class="font-mono font-bold text-base text-yellow-400">8600140465749021</p>
-                    <p class="text-xs text-gray-300 mt-0.5">Saidov S.</p>
-                </div>
-                <button onclick="copyCard()" class="bg-emerald-600 hover:bg-emerald-700 text-xs px-3 py-2 rounded-lg font-bold">Nusxalash</button>
-            </div>
-        </div>
-
-        <div class="ios-card p-4 text-center space-y-4">
-            <p class="text-xs text-gray-300">To'lovni amalga oshirib chek rasm/faylini yuklang:</p>
-            <input type="file" id="file-input" accept="image/*,application/pdf" class="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white file:cursor-pointer">
-            <button onclick="sendOrderToServer()" class="w-full ios-btn p-3.5 font-bold text-sm shadow-md">To'lovni Tasdiqlash</button>
+            <label class="file-label">
+                <span id="file-status">📁 Faylni yuklash (Chek rasmi)</span>
+                <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleFile(this)">
+            </label>
+            <button class="ios-btn" id="submit-pay-btn" onclick="submitPayment()" style="display:none;">To'lovni tasdiqlash</button>
         </div>
     </div>
 
-    <div id="status-page" class="hidden text-center p-8 space-y-4">
-        <div class="w-16 h-16 bg-yellow-500/10 text-yellow-400 rounded-full flex items-center justify-center text-3xl mx-auto animate-pulse">⏳</div>
-        <p class="text-sm font-semibold text-yellow-400 leading-relaxed">To'lovingiz qayta ishlashga yuborildi. Iltimos, admin tasdiqlashini kuting!</p>
+    <div id="sec-status" class="screen">
+        <div class="card-details status-box" id="status-text">
+            To'lovingiz qayta ishlashga yuborildi. Iltimos, admin tasdiqlashini kuting. Sabringiz uchun Rahmat!
+        </div>
+        <div id="dynamic-action-area"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        let o = {};
 
-        function openPage(id) {
-            ['menu-page', 'stars-page', 'premium-page', 'gift-page', 'pay-page', 'status-page'].forEach(p => {
-                document.getElementById(p).classList.add('hidden');
+        let currentOrder = {};
+        let historyStack = [];
+
+        // Stars Setup
+        const starsRates = [50, 100, 200, 500, 1000, 1500, 2000];
+        const starsPricePerUnit = 220;
+
+        function initStars() {
+            const list = document.getElementById('stars-rates-list');
+            list.innerHTML = '';
+            starsRates.forEach(amt => {
+                const price = amt * starsPricePerUnit;
+                const li = document.createElement('li');
+                li.className = 'ios-item';
+                li.innerHTML = `<span>⭐ ${amt.toLocaleString()} Stars</span><span>${price.toLocaleString()} so'm</span>`;
+                li.onclick = () => selectStarsOption(amt, price);
+                list.appendChild(li);
             });
-            document.getElementById(id).classList.remove('hidden');
+            const customLi = document.createElement('li');
+            customLi.className = 'ios-item';
+            customLi.innerHTML = `<span style="color:var(--primary-color)">Boshqa miqdor</span><span>›</span>`;
+            customLi.onclick = () => customStarsAmount();
+            list.appendChild(customLi);
         }
 
-        function setMe(id) {
-            const u = tg.initDataUnsafe?.user?.username;
-            if (u) { document.getElementById(id).value = '@' + u; } 
-            else { alert("Profil usernamesi aniqlanmadi!"); }
+        function switchTab(tab) {
+            document.getElementById('tab-stars').classList.toggle('active', tab === 'stars');
+            document.getElementById('tab-premium').classList.toggle('active', tab === 'premium');
+            document.getElementById('sec-stars').classList.toggle('active', tab === 'stars');
+            document.getElementById('sec-premium').classList.toggle('active', tab === 'premium');
+            historyStack = [];
+        }
+
+        function fillOwnUsername(inputId) {
+            const user = tg.initDataUnsafe?.user?.username;
+            if(user) {
+                document.getElementById(inputId).value = '@' + user;
+            } else {
+                alert("Telegram username topilmadi.");
+            }
+        }
+
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('main-tabs').style.display = (screenId === 'sec-stars' || screenId === 'sec-premium') ? 'flex' : 'none';
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function openPremiumSub(type) {
+            historyStack.push('sec-premium');
+            navigateTo('sec-premium-' + type);
+        }
+
+        function goBack(fallbackScreen) {
+            const prev = historyStack.pop() || fallbackScreen;
+            navigateTo(prev);
+        }
+
+        function selectStarsOption(amount, price) {
+            const username = document.getElementById('stars-username').value.trim();
+            if(!username) { alert("Iltimos, username kiriting!"); return; }
+            currentOrder = { type: 'Stars', amount: amount, price: price, username: username };
+            openPaymentView('sec-stars');
+        }
+
+        function customStarsAmount() {
+            const username = document.getElementById('stars-username').value.trim();
+            if(!username) { alert("Iltimos, username kiriting!"); return; }
+            const amt = prompt("Kiritmoqchi bo'lgan Stars miqdoringizni yozing:");
+            if(!amt || isNaN(amt) || parseInt(amt) <= 0) return;
+            const parsedAmt = parseInt(amt);
+            const price = parsedAmt * starsPricePerUnit;
+            currentOrder = { type: 'Stars', amount: parsedAmt, price: price, username: username };
+            openPaymentView('sec-stars');
+        }
+
+        function selectPremiumOption(title, price) {
+            currentOrder = { type: 'Telegram Premium', title: title, price: price, username: 'O\'zi uchun (In-App)' };
+            openPaymentView('sec-premium-telegram', true); // Show "To'lovni tasdiqlash" button
+        }
+
+        function selectGiftOption(title, price) {
+            const username = document.getElementById('gift-username').value.trim();
+            if(!username) { alert("Iltimos, username kiriting!"); return; }
+            currentOrder = { type: 'Gift Premium', title: title, price: price, username: username };
+            openPaymentView('sec-premium-gift');
+        }
+
+        function openPaymentView(backScreen, showConfirmBtn = false) {
+            historyStack.push(backScreen);
+            document.getElementById('pay-back-btn').onclick = () => goBack(backScreen);
+            const detailText = currentOrder.type === 'Stars' ? `⭐ ${currentOrder.amount} Stars - ${currentOrder.price.toLocaleString()} so'm` : `${currentOrder.title} - ${currentOrder.price.toLocaleString()} so'm`;
+            document.getElementById('pay-item-details').innerText = detailText + `\nTarget: ${currentOrder.username}`;
+            
+            document.getElementById('file-status').innerText = "📁 Faylni yuklash (Chek rasmi)";
+            document.getElementById('file-input').value = "";
+            document.getElementById('submit-pay-btn').style.display = showConfirmBtn ? 'block' : 'none';
+            navigateTo('sec-payment');
         }
 
         function copyCard() {
-            const num = document.getElementById('card-num').innerText;
-            navigator.clipboard.writeText(num);
-            alert("Karta raqami nusxalandi!");
+            const cardNum = document.getElementById('pay-card-num').innerText.replace(/\s/g, '');
+            navigator.clipboard.writeText(cardNum);
+            tg.showAlert("Karta raqami nusxalandi!");
         }
 
-        function buyStars(qty, price) {
-            const user = document.getElementById('stars-user').value.trim();
-            if(!user) { alert("Username kiriting!"); return; }
-            o = { type: 'Stars', details: qty + ' Stars', price: price, target: user };
-            renderPay();
+        let base64File = null;
+        function handleFile(input) {
+            if(input.files && input.files[0]) {
+                document.getElementById('file-status').innerText = "✅ Chek yuklandi: " + input.files[0].name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64File = e.target.result;
+                    // For Stars and Gift, submission triggers automatically upon upload
+                    if(currentOrder.type === 'Stars' || currentOrder.type === 'Gift Premium') {
+                        submitPayment();
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        function showCustomStars() { document.getElementById('custom-stars-block').classList.remove('hidden'); }
-        function calcStars() {
-            const qty = document.getElementById('custom-qty').value;
-            document.getElementById('custom-res').innerText = 'Narxi: ' + (qty * 220).toLocaleString() + ' so\'m';
-        }
-
-        function submitCustomStars() {
-            const qty = parseInt(document.getElementById('custom-qty').value);
-            const user = document.getElementById('stars-user').value.trim();
-            if(!user || !qty || qty <= 0) { alert("Ma'lumotlar xato!"); return; }
-            o = { type: 'Stars', details: qty + ' Stars', price: qty * 220, target: user };
-            renderPay();
-        }
-
-        function buyPremium(name, price) {
-            o = { type: 'Premium', details: name, price: price, target: 'O\'zi uchun' };
-            renderPay();
-        }
-
-        function buyGift(name, price) {
-            const user = document.getElementById('gift-user').value.trim();
-            if(!user) { alert("Hadya uchun username kiriting!"); return; }
-            o = { type: 'Gift', details: name, price: price, target: user };
-            renderPay();
-        }
-
-        function renderPay() {
-            document.getElementById('pay-desc').innerHTML = `<b>Xizmat:</b> ${o.details}<br><b>Manzil:</b> ${o.target}<br><b>Jami:</b> ${o.price.toLocaleString()} so'm`;
-            openPage('pay-page');
-        }
-
-        function sendOrderToServer() {
-            const fileInput = document.getElementById('file-input');
-            if(!fileInput.files[0]) { alert("Iltimos, chek rasmini yuklang!"); return; }
+        function submitPayment() {
+            if(!base64File) { alert("Iltimos, avval to'lov chekini yuklang!"); return; }
             
-            o.user_id = tg.initDataUnsafe?.user?.id || 0;
-            o.username = tg.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : 'Foydalanuvchi';
-            
-            const formData = new FormData();
-            formData.append("order_data", JSON.stringify(o));
-            formData.append("file", fileInput.files[0]);
-            
-            openPage('status-page');
-            
-            // AGAR HOOSTINGDAN FOYDALANASANGIZ QUYIDAGI MANZILGA O'Z DOMENINGIZNI TO'LIQ YOZING
-            fetch('/submit-order', {
+            // Send payload to Backend
+            fetch('/api/order', {
                 method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status !== 'success') {
-                    alert("Xatolik yuz berdi, qayta urinib ko'ring.");
-                    openPage('pay-page');
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    user_id: tg.initDataUnsafe?.user?.id || "8906567040", // test fallback
+                    init_data: tg.initData,
+                    order: currentOrder,
+                    receipt: base64File
+                })
+            }).then(res => res.json()).then(data => {
+                if(data.success) {
+                    listenToStatusUpdates(data.order_id);
+                } else {
+                    alert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                openPage('pay-page');
             });
         }
+
+        function listenToStatusUpdates(orderId) {
+            navigateTo('sec-status');
+            
+            // Long polling mechanism for Real-time App Updates matching admin actions
+            const interval = setInterval(() => {
+                fetch(`/api/order-status?order_id=${orderId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const statusTextDiv = document.getElementById('status-text');
+                    const actionArea = document.getElementById('dynamic-action-area');
+                    
+                    if (data.status === 'approved') {
+                        if(currentOrder.type === 'Telegram Premium') {
+                            statusTextDiv.innerText = "To'lovingiz tasdiqlandi. Bog'lanish uchun username qoldiring";
+                            actionArea.innerHTML = `
+                                <div class="input-group" style="margin-top:15px;">
+                                    <input type="text" id="post-back-user" class="ios-input" placeholder="Username kiriting">
+                                </div>
+                                <button class="ios-btn" onclick="submitPremiumUsername('${orderId}')">Yuborish</button>
+                            `;
+                            clearInterval(interval);
+                        } else {
+                            statusTextDiv.innerText = "To'lovingiz tasdiqlandi. Buyurtmangiz tez orada o'z manziliga yuboriladi";
+                        }
+                    } else if (data.status === 'shipped') {
+                        statusTextDiv.innerHTML = `<img src="${data.screenshot}" style="width:100%; border-radius:8px; margin-bottom:10px;" /><br>Buyurtma o'z manziliga yuborildi. Bizni tanlaganingiz uchun tashakkur! Keyingi haridlarni kutib qolamiz`;
+                        clearInterval(interval);
+                    } else if (data.status === 'rejected') {
+                        statusTextDiv.innerText = "To'lovingiz rad etildi. Buni xatolik deb hisoblasangiz qo'llab-quvvatlash xizmatiga murojaat qiling!";
+                        actionArea.innerHTML = `<button class="ios-btn" style="background:#ff3b30;" onclick="window.open('https://t.me/saiduz', '_blank')">👨🏻‍💻 Support</button>`;
+                        clearInterval(interval);
+                    }
+                });
+            }, 3000);
+        }
+
+        function submitPremiumUsername(orderId) {
+            const user = document.getElementById('post-back-user').value.trim();
+            if(!user) return;
+            fetch('/api/premium-username', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ order_id: orderId, username: user })
+            }).then(() => {
+                tg.close();
+            });
+        }
+
+        // Run
+        initStars();
     </script>
 </body>
 </html>
