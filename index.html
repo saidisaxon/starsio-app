@@ -25,7 +25,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             background: #e3e3e9;
@@ -49,7 +48,6 @@
             box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Windows & Navigation */
         .screen { display: none; }
         .screen.active { display: block; }
         
@@ -72,7 +70,6 @@
         .ios-item:last-child { border-bottom: none; }
         .ios-item:active { background-color: #e5e5ea; }
 
-        /* Inputs & Buttons */
         .input-group {
             display: flex;
             background: var(--surface-color);
@@ -106,7 +103,7 @@
             font-size: 16px;
             border: none;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
             cursor: pointer;
         }
         .ios-btn:active { opacity: 0.8; }
@@ -121,7 +118,6 @@
             font-weight: 500;
         }
 
-        /* Status & Details styling */
         .card-details {
             background: var(--surface-color);
             border-radius: 12px;
@@ -211,7 +207,7 @@
         <div class="back-btn" id="pay-back-btn">‹ Ortga</div>
         <div class="card-details">
             <h3 style="margin-top:0;">To'lov bo'limi</h3>
-            <p id="pay-item-details" style="font-weight:600; color:var(--primary-color);"></p>
+            <p id="pay-item-details" style="font-weight:600; color:var(--primary-color); white-space: pre-line;"></p>
             <div style="font-size:20px; font-weight:bold; margin:15px 0;" id="pay-card-num">5614 6828 8568 7642</div>
             <button class="inline-btn" onclick="copyCard()">Nusxalash</button>
             <div style="margin-top:10px; color:var(--text-secondary)" id="pay-card-holder">Matlabov Saidisaxon</div>
@@ -220,7 +216,7 @@
                 <span id="file-status">📁 Faylni yuklash (Chek rasmi)</span>
                 <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleFile(this)">
             </label>
-            <button class="ios-btn" id="submit-pay-btn" onclick="submitPayment()" style="display:none;">To'lovni tasdiqlash</button>
+            <button class="ios-btn" id="submit-pay-btn" onclick="submitPayment()">To'lovni tasdiqlash</button>
         </div>
     </div>
 
@@ -235,11 +231,14 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        // ⚠️ REPLIT BACKEND URL MANA SHU YERGA QO'YILADI:
+        const BACKEND_URL = "https://loyihangiz-nomi.replit.app"; 
+
         let currentOrder = {};
         let historyStack = [];
+        let base64File = null;
 
-        // Stars Setup
-        const starsRates = [50, 100, 200, 500, 1000, 1500, 2000];
+        const starsRates = [50, 100, 200, 500, 1000, 1500];
         const starsPricePerUnit = 220;
 
         function initStars() {
@@ -312,8 +311,8 @@
         }
 
         function selectPremiumOption(title, price) {
-            currentOrder = { type: 'Telegram Premium', title: title, price: price, username: 'O\'zi uchun (In-App)' };
-            openPaymentView('sec-premium-telegram', true); // Show "To'lovni tasdiqlash" button
+            currentOrder = { type: 'Telegram Premium', title: title, price: price, username: 'In-App (O\'zi uchun)' };
+            openPaymentView('sec-premium-telegram');
         }
 
         function selectGiftOption(title, price) {
@@ -323,68 +322,79 @@
             openPaymentView('sec-premium-gift');
         }
 
-        function openPaymentView(backScreen, showConfirmBtn = false) {
+        function openPaymentView(backScreen) {
             historyStack.push(backScreen);
             document.getElementById('pay-back-btn').onclick = () => goBack(backScreen);
-            const detailText = currentOrder.type === 'Stars' ? `⭐ ${currentOrder.amount} Stars - ${currentOrder.price.toLocaleString()} so'm` : `${currentOrder.title} - ${currentOrder.price.toLocaleString()} so'm`;
-            document.getElementById('pay-item-details').innerText = detailText + `\nTarget: ${currentOrder.username}`;
             
+            const detailText = currentOrder.type === 'Stars' ? 
+                `⭐ ${currentOrder.amount} Stars - ${currentOrder.price.toLocaleString()} so'm` : 
+                `${currentOrder.title} - ${currentOrder.price.toLocaleString()} so'm`;
+                
+            document.getElementById('pay-item-details').innerText = detailText + `\nFoydalanuvchi: ${currentOrder.username}`;
             document.getElementById('file-status').innerText = "📁 Faylni yuklash (Chek rasmi)";
             document.getElementById('file-input').value = "";
-            document.getElementById('submit-pay-btn').style.display = showConfirmBtn ? 'block' : 'none';
+            base64File = null; 
             navigateTo('sec-payment');
         }
 
         function copyCard() {
             const cardNum = document.getElementById('pay-card-num').innerText.replace(/\s/g, '');
             navigator.clipboard.writeText(cardNum);
-            tg.showAlert("Karta raqami nusxalandi!");
+            alert("Karta raqami nusxalandi!");
         }
 
-        let base64File = null;
         function handleFile(input) {
             if(input.files && input.files[0]) {
                 document.getElementById('file-status').innerText = "✅ Chek yuklandi: " + input.files[0].name;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     base64File = e.target.result;
-                    // For Stars and Gift, submission triggers automatically upon upload
-                    if(currentOrder.type === 'Stars' || currentOrder.type === 'Gift Premium') {
-                        submitPayment();
-                    }
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function submitPayment() {
-            if(!base64File) { alert("Iltimos, avval to'lov chekini yuklang!"); return; }
+            if(!base64File) { 
+                alert("Iltimos, avval to'lov chekini yuklang (Faylni yuklash tugmasi)!"); 
+                return; 
+            }
             
-            // Send payload to Backend
-            fetch('/api/order', {
+            document.getElementById('submit-pay-btn').innerText = "Yuborilmoqda...";
+            document.getElementById('submit-pay-btn').disabled = true;
+
+            fetch(`${BACKEND_URL}/api/order`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    user_id: tg.initDataUnsafe?.user?.id || "8906567040", // test fallback
+                    user_id: tg.initDataUnsafe?.user?.id || "8906567040", 
                     init_data: tg.initData,
                     order: currentOrder,
                     receipt: base64File
                 })
-            }).then(res => res.json()).then(data => {
+            })
+            .then(res => res.json())
+            .then(data => {
                 if(data.success) {
                     listenToStatusUpdates(data.order_id);
                 } else {
                     alert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+                    document.getElementById('submit-pay-btn').innerText = "To'lovni tasdiqlash";
+                    document.getElementById('submit-pay-btn').disabled = false;
                 }
+            })
+            .catch(err => {
+                alert("Backendga ulanishda xato! Replit havolasini to'g'ri qo'yganingizni tekshiring.");
+                document.getElementById('submit-pay-btn').innerText = "To'lovni tasdiqlash";
+                document.getElementById('submit-pay-btn').disabled = false;
             });
         }
 
         function listenToStatusUpdates(orderId) {
             navigateTo('sec-status');
             
-            // Long polling mechanism for Real-time App Updates matching admin actions
             const interval = setInterval(() => {
-                fetch(`/api/order-status?order_id=${orderId}`)
+                fetch(`${BACKEND_URL}/api/order-status?order_id=${orderId}`)
                 .then(res => res.json())
                 .then(data => {
                     const statusTextDiv = document.getElementById('status-text');
@@ -418,7 +428,7 @@
         function submitPremiumUsername(orderId) {
             const user = document.getElementById('post-back-user').value.trim();
             if(!user) return;
-            fetch('/api/premium-username', {
+            fetch(`${BACKEND_URL}/api/premium-username`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ order_id: orderId, username: user })
@@ -427,7 +437,6 @@
             });
         }
 
-        // Run
         initStars();
     </script>
 </body>
