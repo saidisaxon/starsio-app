@@ -3,43 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Starsio</title>
+    <title>Starsio Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
+            --bg-dark: #0e1624;
+            --bg-card: #172130;
+            --bg-input: #1f2c3f;
             --text-main: #ffffff;
-            --text-muted: #94a3b8;
+            --text-muted: #708599;
             --accent-blue: #248bf2;
-            --accent-gradient: linear-gradient(135deg, #2897f3 0%, #1772e6 100%);
-            --purple-banner: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            --green-banner: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --border-color: #334155;
+            --accent-blue-gradient: linear-gradient(135deg, #3ea1f9 0%, #1a72d6 100%);
+            --border-color: #243447;
+            --success-green: #34c759;
+            --danger-red: #ff3b30;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
-            margin: 0;
             padding: 16px;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
+            overflow-x: hidden;
             user-select: none;
         }
 
-        /* Top Toggle Buttons */
+        /* iOS style Header Tabs */
         .top-tabs {
             display: flex;
-            background: #131c2e;
-            padding: 3px;
-            border-radius: 20px;
-            margin-bottom: 16px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
         .tab-btn {
@@ -49,67 +52,72 @@
             padding: 10px;
             font-size: 15px;
             font-weight: 600;
-            border-radius: 18px;
+            border-radius: 9px;
             color: var(--text-muted);
             cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .tab-btn.active {
             background: var(--accent-blue);
-            color: white;
+            color: #ffffff;
         }
 
-        /* Banners */
-        .banner {
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.4;
-        }
-        .banner span {
-            display: block;
-            font-size: 11px;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
-        .banner-purple { background: var(--purple-banner); }
-        .banner-green { background: var(--green-banner); }
-
-        /* Main Showcase Card */
-        .hero-card {
+        /* iOS Cards */
+        .ios-card {
             background: var(--bg-card);
-            border-radius: 24px;
-            padding: 30px 20px;
-            text-align: center;
+            border-radius: 16px;
+            padding: 20px;
             border: 1px solid var(--border-color);
-            margin-bottom: 24px;
-        }
-        .hero-icon {
-            font-size: 55px;
             margin-bottom: 16px;
         }
+
         .hero-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            margin: 0 0 8px 0;
+            margin-bottom: 8px;
+            text-align: center;
         }
         .hero-desc {
             font-size: 14px;
             color: var(--text-muted);
-            margin: 0 0 20px 0;
+            text-align: center;
             line-height: 1.5;
+            margin-bottom: 20px;
         }
 
-        /* Forms */
+        /* Forms & Inputs */
+        .input-wrapper {
+            margin-bottom: 16px;
+        }
+        .input-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .ozim-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
         .input-box {
-            background: #131c2e;
+            background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 12px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            margin-bottom: 16px;
         }
         .input-box input {
             background: transparent;
@@ -117,68 +125,78 @@
             outline: none;
             color: white;
             font-size: 15px;
-            flex: 1;
-        }
-        .inline-action {
-            background: rgba(36, 139, 242, 0.15);
-            color: var(--accent-blue);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
+            width: 100%;
         }
 
-        /* Item Selection Lists */
+        /* Lists */
         .tier-list {
-            padding: 0;
-            margin: 0;
             list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
         }
         .tier-item {
-            background: var(--bg-card);
+            background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 10px;
+            border-radius: 12px;
+            padding: 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
             font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .tier-item.clickable { cursor: pointer; }
+        .tier-item:active {
+            background: var(--border-color);
+        }
         .tier-item .price {
+            color: var(--text-main);
             background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
+            padding: 4px 10px;
+            border-radius: 8px;
         }
 
+        /* Buttons */
         .action-btn {
-            background: var(--accent-gradient);
+            background: var(--accent-blue-gradient);
             color: white;
             border: none;
             width: 100%;
-            padding: 15px;
-            border-radius: 16px;
+            padding: 14px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(36, 139, 242, 0.3);
+        }
+        .action-btn:disabled {
+            opacity: 0.5;
+        }
+        .back-btn {
+            color: var(--accent-blue);
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        /* Navigation menu */
+        /* Bottom Menu Bar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #090d16;
+            background: var(--bg-card);
             border-top: 1px solid var(--border-color);
             display: flex;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)) 0;
-            z-index: 100;
+            z-index: 1000;
         }
         .nav-item {
             flex: 1;
@@ -191,155 +209,237 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
         }
-        .nav-item.active { color: var(--accent-blue); }
-        .nav-icon { font-size: 20px; }
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
 
         .screen { display: none; }
         .screen.active { display: block; }
-        
-        .back-link {
-            color: var(--accent-blue);
-            font-size: 15px;
-            margin-bottom: 16px;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .file-upload-label {
-            display: block;
-            background: #131c2e;
-            border: 1px dashed var(--border-color);
-            border-radius: 14px;
+
+        /* File Upload */
+        .file-box {
+            border: 2px dashed var(--border-color);
+            background: var(--bg-input);
+            border-radius: 12px;
             padding: 24px;
             text-align: center;
             color: var(--text-muted);
-            margin: 20px 0;
+            margin: 16px 0;
             cursor: pointer;
+            font-weight: 500;
         }
+
+        .small-banner-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .ranking-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
-    <!-- Top Tabs (Stars / Premium) -->
+    <!-- TOP NAVIGATION TABS -->
     <div id="top-tabs-container" class="top-tabs">
-        <button id="tab-stars" class="tab-btn active" onclick="switchMode('stars')">Stars</button>
-        <button id="tab-premium" class="tab-btn" onclick="switchMode('premium')">Premium</button>
+        <button id="tab-stars" class="tab-btn active" onclick="switchMainSection('stars')">⭐ Stars</button>
+        <button id="tab-premium" class="tab-btn" onclick="switchMainSection('premium')">💎 Premium</button>
     </div>
 
-    <!-- MAIN STARS SCREEN -->
+    <!-- 1. STARS SECTION -->
     <div id="scr-stars" class="screen active">
-        <div class="banner banner-purple">
-            Endi Uzum Bank orqali ham
-            <span>Yangi to'lov usuli ›</span>
-        </div>
-        <div class="hero-card">
-            <div class="hero-icon">⭐</div>
-            <h2 class="hero-title">Starsio Stars</h2>
-            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Stars balansini to'ldiring — qulay to'lov usullari va tezkor yetkazib berish.</p>
-            <div class="input-box">
-                <input type="text" id="stars-username" placeholder="@username kiriting...">
-                <button class="inline-action" onclick="fillMe('stars-username')">O'zimga</button>
-            </div>
-            <button class="action-btn" onclick="showStarsTiers()">Stars olish</button>
-        </div>
-    </div>
-
-    <!-- MAIN PREMIUM SCREEN -->
-    <div id="scr-premium" class="screen">
-        <div class="banner banner-green">
-            Naqd pul bilan ham olishingiz mumkin
-            <span>Paynet terminal orqali ›</span>
-        </div>
-        <div class="hero-card">
-            <div class="hero-icon">💙</div>
-            <h2 class="hero-title">Starsio Premium</h2>
-            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Telegram Premium obunasi.</p>
-            <button class="action-btn" onclick="showPremiumTiers()">Premium olish</button>
-        </div>
-    </div>
-
-    <!-- REFERRAL & RATING SYSTEM SCREEN -->
-    <div id="scr-referral" class="screen">
-        <div class="hero-card" style="padding: 20px; text-align: left;">
-            <h2 class="hero-title" style="text-align: center; margin-bottom: 4px;">Referral Tizimi</h2>
-            <p class="hero-desc" style="text-align: center;">Har bir taklif qilingan do'stingiz uchun **+1 ball** oling!</p>
+        <div class="ios-card">
+            <h2 class="hero-title">Telegram Stars olish ⭐</h2>
+            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Stars balansini to'ldiring — qulay to'lov usullari.</p>
             
-            <div style="background: #131c2e; border-radius: 14px; padding: 15px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                <span style="font-size: 13px; color: var(--text-muted);">Sizning ballaringiz</span>
-                <div style="font-size: 32px; font-weight: bold; color: #f59e0b; margin: 5px 0;" id="ref-score-val">0</div>
-                <input type="text" id="ref-link-input" readonly style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; margin-top: 8px;" value="Yuklanmoqda...">
-                <button class="inline-action" style="margin-top: 10px; width: 100%; padding: 10px;" onclick="copyRefLink()">Havolani nusxalash</button>
+            <div class="input-wrapper">
+                <div class="input-label-row">
+                    <span>Kimga?</span>
+                    <button class="ozim-btn" onclick="autoFillUsername('stars-user')">O'zimga</button>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="stars-user" placeholder="@username kiriting...">
+                </div>
             </div>
 
-            <h3 style="margin-bottom: 12px; font-size: 16px;">🏆 Umumiy Reyting (Top taklifchilar)</h3>
-            <ul class="tier-list" id="rating-render-area">
-                <li class="tier-item"><div style="color: var(--text-muted)">Yuklanmoqda...</div></li>
+            <div class="input-label-row" style="margin-top: 10px;"><span>To'plamni tanlang</span></div>
+            <ul class="tier-list" id="stars-list-render"></ul>
+            
+            <div class="tier-item" style="justify-content: center; background: transparent; border-style: dashed; color: var(--accent-blue);" onclick="customStarsPrompt()">
+                ➕ Boshqa miqdor
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PREMIUM MENU SELECTION -->
+    <div id="scr-premium" class="screen">
+        <div class="ios-card" style="text-align: center;">
+            <h2 class="hero-title" style="margin-bottom: 20px;">Telegram Premium Obuna</h2>
+            <ul class="tier-list">
+                <li class="tier-item" onclick="openPremiumSubSection('telegram-premium')">
+                    <span>💎 Telegram Premium</span>
+                    <span>›</span>
+                </li>
+                <li class="tier-item" onclick="openPremiumSubSection('gift-premium')">
+                    <span>🎁 Gift Premium</span>
+                    <span>›</span>
+                </li>
             </ul>
         </div>
     </div>
 
-    <!-- STARS TIERS SELECTION -->
-    <div id="scr-stars-tiers" class="screen">
-        <div class="back-link" onclick="goBack('scr-stars')">‹ Ortga</div>
-        <h3 style="margin-bottom:16px;">To'plamni tanlang</h3>
-        <ul class="tier-list" id="stars-render-area"></ul>
+    <!-- 2A. TELEGRAM PREMIUM SUB-SECTION -->
+    <div id="scr-tg-premium-list" class="screen">
+        <div class="back-btn" onclick="navigateBack('scr-premium')">‹ Ortga</div>
+        <div class="ios-card">
+            <h2 class="hero-title">💎 Telegram Premium</h2>
+            <p class="hero-desc">O'zingiz uchun Telegram Premium muddatini tanlang</p>
+            <ul class="tier-list">
+                <li class="tier-item" onclick="selectPremiumOrder('Telegram Premium', '1 oy', 41990)">
+                    <span>1 oy</span> <span class="price">41,990 so'm</span>
+                </li>
+                <li class="tier-item" onclick="selectPremiumOrder('Telegram Premium', '12 oy', 294990)">
+                    <span>12 oy</span> <span class="price">294,990 so'm</span>
+                </li>
+            </ul>
+        </div>
     </div>
 
-    <!-- PREMIUM TIERS SELECTION -->
-    <div id="scr-premium-tiers" class="screen">
-        <div class="back-link" onclick="goBack('scr-premium')">‹ Ortga</div>
-        <h3 style="margin-bottom:16px;">Muddatni tanlang</h3>
-        <ul class="tier-list" id="premium-render-area"></ul>
-    </div>
-
-    <!-- CHECKOUT VIEW -->
-    <div id="scr-checkout" class="screen">
-        <div class="back-link" id="checkout-back-hook">‹ Ortga</div>
-        <div class="hero-card" style="text-align:left; padding:20px;">
-            <h3 style="margin-top:0; text-align:center;">To'lov bo'limi</h3>
-            <p id="checkout-meta" style="font-size:14px; color:var(--text-muted); line-height:1.6; border-bottom:1px solid var(--border-color); padding-bottom:12px; white-space: pre-line;"></p>
+    <!-- 2B. GIFT PREMIUM SUB-SECTION -->
+    <div id="scr-gift-premium-list" class="screen">
+        <div class="back-btn" onclick="navigateBack('scr-premium')">‹ Ortga</div>
+        <div class="ios-card">
+            <h2 class="hero-title">🎁 Gift Premium</h2>
+            <p class="hero-desc">Yaqinlaringiz yoki o'zingizga Premium hadya qiling</p>
             
-            <div style="text-align:center; padding:15px 0;">
-                <span style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">KARTA RAQAMI</span>
-                <div style="font-size:22px; font-weight:bold; color:white;" id="card-display">5614 6828 8568 7642</div>
-                <button class="inline-action" style="margin-top:8px;" onclick="copyCardNum()">Nusxalash</button>
-                <div style="font-size:14px; color:var(--text-muted); margin-top:8px;">Matlabov Saidisaxon</div>
+            <div class="input-wrapper">
+                <div class="input-label-row">
+                    <span>Kimga?</span>
+                    <button class="ozim-btn" onclick="autoFillUsername('gift-user')">O'zimga</button>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="gift-user" placeholder="@username kiriting...">
+                </div>
             </div>
 
-            <label class="file-upload-label">
-                <span id="upload-label-text">📁 To'lov chekini yuklash (Rasm)</span>
-                <input type="file" id="receipt-file" accept="image/*" style="display:none;" onchange="processFile(this)">
+            <ul class="tier-list">
+                <li class="tier-item" onclick="selectGiftOrder('3 oy', 165990)">
+                    <span>3 oy</span> <span class="price">165,990 so'm</span>
+                </li>
+                <li class="tier-item" onclick="selectGiftOrder('6 oy', 224990)">
+                    <span>6 oy</span> <span class="price">224,990 so'm</span>
+                </li>
+                <li class="tier-item" onclick="selectGiftOrder('12 oy', 394990)">
+                    <span>12 oy</span> <span class="price">394,990 so'm</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 3. CHECKOUT SCREEN -->
+    <div id="scr-checkout" class="screen">
+        <div class="back-btn" id="checkout-back-btn">‹ Ortga</div>
+        <div class="ios-card">
+            <h3 style="text-align: center; margin-bottom: 16px;">To'lov sahifasi</h3>
+            <p id="checkout-details" style="font-size: 14px; margin-bottom: 20px; line-height: 1.5; color: var(--text-muted); background: var(--bg-input); padding: 12px; border-radius: 8px; white-space: pre-line;"></p>
+            
+            <div style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <span style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">KARTA RAQAMI</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="card-num" style="font-size: 18px; font-weight: 700; letter-spacing: 1px;">5614 6828 8568 7642</span>
+                    <button class="ozim-btn" onclick="copyCardNumber()">Nusxalash</button>
+                </div>
+                <span style="font-size: 14px; display: block; margin-top: 8px; color: #fff;">Matlabov Saidisaxon</span>
+            </div>
+
+            <label class="file-box">
+                <span id="file-status-text">📁 To'lov chekini yuklash (Rasm yoki Fayl)</span>
+                <input type="file" id="file-receipt-input" accept="image/*,application/pdf" style="display: none;" onchange="handleFileChange(this)">
             </label>
 
-            <button class="action-btn" id="final-pay-btn" onclick="dispatchOrder()">To'lovni tasdiqlash</button>
+            <button class="action-btn" id="btn-submit-order" onclick="submitCurrentOrder()">To'lovni tasdiqlash</button>
         </div>
     </div>
 
-    <!-- STATUS TRACKING -->
-    <div id="scr-status" class="screen">
-        <div class="hero-card">
-            <div class="hero-icon" id="status-icon">⏳</div>
-            <h3 id="status-headline">To'lov yuborildi</h3>
-            <p id="status-body" class="hero-desc">Sizning to'lovingiz tizim administratorlari tomonidan tekshirilmoqda. Iltimos sahifani yopmang yoki kuting.</p>
-            <div id="status-interactive-gate"></div>
+    <!-- 4. REAL-TIME INTERACTIVE STATUS TRACKER -->
+    <div id="scr-status-tracker" class="screen">
+        <div class="ios-card" style="text-align: center; padding: 30px 20px;">
+            <div id="status-icon" style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+            <h3 id="status-title" style="margin-bottom: 12px; font-size: 18px;">To'lovingiz qayta ishlashga yuborildi</h3>
+            <p id="status-message" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+                Iltimos, admin tasdiqlashini kuting. Sabringiz uchun Rahmat!
+            </p>
+            <div id="dynamic-interaction-area"></div>
         </div>
     </div>
 
-    <!-- BOTTOM APP NAVIGATION -->
+    <!-- 5. REFERRAL VIEW -->
+    <div id="scr-referral" class="screen">
+        <div class="ios-card">
+            <h3 style="margin-bottom: 6px;">👥 Do'stlar taklifi</h3>
+            <p class="small-banner-text">Referalingiz orqali qoshilgan har bir do'stingiz uchun +1 ball qo'shilib boraveradi. Har oy top 1 referral foydalanuvchisiga 1 oy Telegram Premium hadya sifatida beriladi!</p>
+            
+            <div style="background: var(--bg-input); padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
+                <span style="font-size: 12px; color: var(--text-muted);">Sizning taklif havolangiz:</span>
+                <input type="text" id="ref-link-field" readonly style="width:100%; background:var(--bg-dark); border:1px solid var(--border-color); color:#fff; text-align:center; padding:6px; border-radius:6px; margin:8px 0; font-size:12px;">
+                <button class="ozim-btn" onclick="navigator.clipboard.writeText(document.getElementById('ref-link-field').value); alert('Havola nusxalandi!')">Havolani nusxalash</button>
+            </div>
+
+            <h4 style="margin-bottom: 10px; font-size: 14px; color: var(--accent-blue);">🏆 Top 10 Taklifchilar</h4>
+            <div id="referral-leaderboard"></div>
+        </div>
+    </div>
+
+    <!-- 6. RATINGS (HARID BALLARI) VIEW -->
+    <div id="scr-rating" class="screen">
+        <div class="ios-card">
+            <h3 style="margin-bottom: 6px;">🎯 Haridlar reytingi</h3>
+            <p class="small-banner-text">Har bir harid uchun ko'rsatilgan ballar qoshib boriladi. Har oy oxirida top 1 foydalanuvchiga 1 oy Telegram Premium hadya sifatida beriladi</p>
+            
+            <div style="background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; line-height: 1.4; color: var(--text-muted);">
+                ⚡ <b>Ballar tizimi:</b> Stars haridi uchun +1 ball | Premium uchun +5 ball | Gift Premium uchun +8 ball (Faqat yakunlangan buyurtmalar uchun).
+            </div>
+
+            <h4 style="margin-bottom: 10px; font-size: 14px; color: var(--accent-blue);">🏆 Top 10 Haridorlar</h4>
+            <div id="purchase-leaderboard"></div>
+        </div>
+    </div>
+
+    <!-- 7. PURCHASES HISTORY VIEW -->
+    <div id="scr-history" class="screen">
+        <div class="ios-card">
+            <h3 style="margin-bottom: 12px;">🕒 Haridlar tarixi</h3>
+            <div id="history-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+    </div>
+
+    <!-- BOTTOM FIXED APP NAVIGATION -->
     <div class="bottom-nav">
-        <button class="nav-item active" id="nav-home" onclick="navigateTo('home')">
-            <span class="nav-icon">⭐</span>Starsio
+        <button class="nav-item active" id="nav-main" onclick="switchNavTab('main')">
+            <span class="nav-icon">⭐</span>Asosiy
         </button>
-        <button class="nav-item" id="nav-ref" onclick="navigateTo('referral')">
+        <button class="nav-item" id="nav-referral" onclick="switchNavTab('referral')">
             <span class="nav-icon">👥</span>Referral
         </button>
-        <button class="nav-item" onclick="alert('Hamyon hozircha faol emas')">
-            <span class="nav-icon">💼</span>Hamyon
+        <button class="nav-item" id="nav-rating" onclick="switchNavTab('rating')">
+            <span class="nav-icon">🎯</span>Reyting
         </button>
-        <button class="nav-item" onclick="alert('Tarix bo\'sh')">
-            <span class="nav-icon">🕒</span>Tarix
+        <button class="nav-item" id="nav-history" onclick="switchNavTab('history')">
+            <span class="nav-icon">🕒</span>Haridlar
         </button>
     </div>
 
@@ -348,254 +448,315 @@
         tg.expand();
         tg.ready();
 
-        const REPLIT_HOST = "https://d2ec0b89-bc7d-45d1-a016-57d6904008b1-00-2x1s0wvp9le2k.sisko.replit.dev";
-        const currentUserId = tg.initDataUnsafe?.user?.id || "DEBUG_USER";
+        const BACKEND_URL = window.location.origin; // Replit domenida joylashganda avtomatik moslashadi
+        const currentUserId = tg.initDataUnsafe?.user?.id || "9999999";
+        
+        let activeMainSection = 'stars'; 
+        let orderDraft = null;
+        let base64File = null;
+        let screenHistory = [];
 
-        let orderDraft = {};
-        let uiStack = [];
-        let encodedReceipt = null;
+        const starTiers = [50, 100, 200, 500, 1000, 1500];
+        const starPricePerUnit = 220;
 
-        // Narxlar yangilandi: 1 Star = 220 so'm
-        const starPricing = [
-            {qty: 50, price: 50 * 220},
-            {qty: 100, price: 100 * 220},
-            {qty: 250, price: 250 * 220},
-            {qty: 500, price: 500 * 220},
-            {qty: 1000, price: 1000 * 220},
-            {qty: 5000, price: 5000 * 220}
-        ];
+        function renderStarsList() {
+            const container = document.getElementById('stars-list-render');
+            container.innerHTML = '';
+            starTiers.forEach(qty => {
+                const price = qty * starPricePerUnit;
+                const li = document.createElement('li');
+                li.className = 'tier-item';
+                li.innerHTML = `<span>⭐ ${qty.toLocaleString()} Stars</span><span class="price">${price.toLocaleString()} so'm</span>`;
+                li.onclick = () => selectStarsOrder(qty, price);
+                container.appendChild(li);
+            });
+        }
 
-        // Premium narxlari eski xato holatidan sizning gaplaringizga moslab sozlandi
-        const premiumPricing = [
-            {months: "3 oy", price: 159999, label: "3 oy obuna (-20%)"},
-            {months: "6 oy", price: 219999, label: "6 oy obuna (-37%)"},
-            {months: "1 yil", price: 389999, label: "1 yil obuna (-42%)"}
-        ];
-
-        function navigateTo(tab) {
-            document.getElementById('nav-home').classList.toggle('active', tab === 'home');
-            document.getElementById('nav-ref').classList.toggle('active', tab === 'referral');
+        function switchMainSection(sect) {
+            activeMainSection = sect;
+            document.getElementById('tab-stars').classList.toggle('active', sect === 'stars');
+            document.getElementById('tab-premium').classList.toggle('active', sect === 'premium');
             
-            if (tab === 'home') {
-                switchMode('stars');
-            } else if (tab === 'referral') {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('scr-referral').classList.add('active');
-                document.getElementById('top-tabs-container').style.display = 'none';
-                loadReferralData();
+            document.getElementById('scr-stars').classList.toggle('active', sect === 'stars');
+            document.getElementById('scr-premium').classList.toggle('active', sect === 'premium');
+            
+            document.getElementById('scr-tg-premium-list').classList.remove('active');
+            document.getElementById('scr-gift-premium-list').classList.remove('active');
+            screenHistory = [];
+        }
+
+        function openPremiumSubSection(sub) {
+            document.getElementById('scr-premium').classList.remove('active');
+            if(sub === 'telegram-premium') {
+                showScreen('scr-tg-premium-list');
+            } else {
+                showScreen('scr-gift-premium-list');
             }
         }
 
-        function switchMode(mode) {
-            document.getElementById('tab-stars').classList.toggle('active', mode === 'stars');
-            document.getElementById('tab-premium').classList.toggle('active', mode === 'premium');
-            document.getElementById('scr-stars').classList.toggle('active', mode === 'stars');
-            document.getElementById('scr-premium').classList.toggle('active', mode === 'premium');
-            document.getElementById('top-tabs-container').style.display = 'flex';
-            uiStack = [];
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            const isMainTabsVisible = (screenId === 'scr-stars' || screenId === 'scr-premium');
+            document.getElementById('top-tabs-container').style.display = isMainTabsVisible ? 'flex' : 'none';
         }
 
-        function fillMe(targetFieldId) {
+        function navigateBack(fallbackScreen) {
+            const prev = screenHistory.pop() || fallbackScreen;
+            showScreen(prev);
+        }
+
+        function autoFillUsername(fieldId) {
             const username = tg.initDataUnsafe?.user?.username;
             if(username) {
-                document.getElementById(targetFieldId).value = '@' + username;
+                document.getElementById(fieldId).value = '@' + username;
             } else {
-                alert("Sizda ommaviy username sozlanmagan.");
+                alert("Telegram sozlamalarida username topilmadi.");
             }
         }
 
-        function viewTransition(targetScreenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(targetScreenId).classList.add('active');
-            const showTop = ['scr-stars', 'scr-premium'].includes(targetScreenId);
-            document.getElementById('top-tabs-container').style.display = showTop ? 'flex' : 'none';
-        }
-
-        function goBack(fallback) {
-            const previous = uiStack.pop() || fallback;
-            viewTransition(previous);
-        }
-
-        function showStarsTiers() {
-            const user = document.getElementById('stars-username').value.trim();
+        function selectStarsOrder(qty, price) {
+            const user = document.getElementById('stars-user').value.trim();
             if(!user) { alert("Iltimos, avval username kiriting!"); return; }
-            
-            const container = document.getElementById('stars-render-area');
-            container.innerHTML = '';
-            
-            starPricing.forEach(tier => {
-                const li = document.createElement('li');
-                li.className = 'tier-item clickable';
-                li.innerHTML = `<div>⭐ ${tier.qty.toLocaleString()} Stars</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
-                li.onclick = () => {
-                    orderDraft = { type: 'Stars', amount: tier.qty, price: tier.price, username: user };
-                    triggerCheckout('scr-stars-tiers');
-                };
-                container.appendChild(li);
-            });
-            
-            uiStack.push('scr-stars');
-            viewTransition('scr-stars-tiers');
+            orderDraft = { type: 'Stars', quantity: qty, price: price, targetUser: user };
+            openCheckout('scr-stars');
         }
 
-        function showPremiumTiers() {
-            const container = document.getElementById('premium-render-area');
-            container.innerHTML = '';
-            
-            premiumPricing.forEach(tier => {
-                const li = document.createElement('li');
-                li.className = 'tier-item clickable';
-                li.innerHTML = `<div>💎 Premium - ${tier.months}</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
-                li.onclick = () => {
-                    const clientUser = tg.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '@no_username';
-                    orderDraft = { type: 'Premium', title: tier.label, price: tier.price, username: clientUser };
-                    triggerCheckout('scr-premium-tiers');
-                };
-                container.appendChild(li);
-            });
-
-            uiStack.push('scr-premium');
-            viewTransition('scr-premium-tiers');
+        function customStarsPrompt() {
+            const user = document.getElementById('stars-user').value.trim();
+            if(!user) { alert("Iltimos, avval username kiriting!"); return; }
+            const customQty = prompt("Xohlagan miqdordagi Stars miqdorini kiriting:");
+            if(customQty) {
+                const qty = parseInt(customQty);
+                if(isNaN(qty) || qty <= 0) { alert("Noto'g'ri miqdor kiritildi!"); return; }
+                const price = qty * starPricePerUnit;
+                orderDraft = { type: 'Stars', quantity: qty, price: price, targetUser: user };
+                openCheckout('scr-stars');
+            }
         }
 
-        function triggerCheckout(backScreenHook) {
-            uiStack.push(backScreenHook);
-            document.getElementById('checkout-back-hook').onclick = () => goBack(backScreenHook);
-
-            const metaStr = orderDraft.type === 'Stars' ? 
-                `Xizmat turi: Starsio Stars\nMiqdori: ⭐ ${orderDraft.amount} Stars\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}` :
-                `Xizmat turi: Starsio Premium\nPaket: ${orderDraft.title}\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}`;
-            
-            document.getElementById('checkout-meta').innerText = metaStr;
-            document.getElementById('upload-label-text').innerText = "📁 To'lov chekini yuklash (Rasm)";
-            document.getElementById('receipt-file').value = '';
-            encodedReceipt = null;
-
-            viewTransition('scr-checkout');
+        function selectPremiumOrder(type, duration, price) {
+            orderDraft = { type: type, duration: duration, price: price, targetUser: '@self' };
+            openCheckout('scr-tg-premium-list');
         }
 
-        function copyCardNum() {
-            const num = document.getElementById('card-display').innerText.replace(/\s/g, '');
+        function selectGiftOrder(duration, price) {
+            const user = document.getElementById('gift-user').value.trim();
+            if(!user) { alert("Iltimos, avval username kiriting!"); return; }
+            orderDraft = { type: 'Gift Premium', duration: duration, price: price, targetUser: user };
+            openCheckout('scr-gift-premium-list');
+        }
+
+        function openCheckout(backScreen) {
+            screenHistory.push(backScreen);
+            document.getElementById('checkout-back-btn').onclick = () => navigateBack(backScreen);
+            
+            let metaText = `Buyurtma turi: ${orderDraft.type}\n`;
+            if(orderDraft.quantity) metaText += `Miqdori: ${orderDraft.quantity} Stars\n`;
+            if(orderDraft.duration) metaText += `Muddati: ${orderDraft.duration}\n`;
+            if(orderDraft.targetUser !== '@self') metaText += `Manzil (Username): ${orderDraft.targetUser}\n`;
+            metaText += `Jami to'lov: ${orderDraft.price.toLocaleString()} so'm`;
+            
+            document.getElementById('checkout-details').innerText = metaText;
+            document.getElementById('file-status-text').innerText = "📁 To'lov chekini yuklash (Rasm yoki Fayl)";
+            document.getElementById('file-receipt-input').value = '';
+            base64File = null;
+            showScreen('scr-checkout');
+        }
+
+        function copyCardNumber() {
+            const num = document.getElementById('card-num').innerText.replace(/\s/g, '');
             navigator.clipboard.writeText(num);
             alert("Karta raqami nusxalandi!");
         }
 
-        function copyRefLink() {
-            const linkInput = document.getElementById('ref-link-input');
-            linkInput.select();
-            navigator.clipboard.writeText(linkInput.value);
-            alert("Sizning referral havolangiz nusxalandi!");
-        }
-
-        function processFile(elem) {
-            if(elem.files && elem.files[0]) {
-                document.getElementById('upload-label-text').innerText = "✅ Chek muvaffaqiyatli yuklandi!";
-                const stream = new FileReader();
-                stream.onload = function(evt) {
-                    encodedReceipt = evt.target.result;
+        function handleFileChange(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('file-status-text').innerText = `✅ Fayl tanlandi: ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    base64File = e.target.result;
                 };
-                stream.readAsDataURL(elem.files[0]);
+                reader.readAsDataURL(file);
             }
         }
 
-        function loadReferralData() {
-            // Replit'dan referral va reyting ma'lumotlarini olish
-            fetch(`${REPLIT_HOST}/api/referral?user_id=${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('ref-score-val').innerText = data.score;
-                document.getElementById('ref-link-input').value = data.referral_link;
-                
-                const container = document.getElementById('rating-render-area');
-                container.innerHTML = '';
-                
-                if(data.leaderboard && data.leaderboard.length > 0) {
-                    data.leaderboard.forEach((lead, idx) => {
-                        const li = document.createElement('li');
-                        li.className = 'tier-item';
-                        li.innerHTML = `<div>${idx + 1}. ${lead.username || 'Foydalanuvchi'}</div><div style="color:#f59e0b;">🔥 ${lead.score} ball</div>`;
-                        container.appendChild(li);
-                    });
-                } else {
-                    container.innerHTML = '<li class="tier-item"><div style="color: var(--text-muted)">Hozircha reyting bo\'sh</div></li>';
-                }
-            })
-            .catch(() => {
-                document.getElementById('ref-link-input').value = "Ulanishda xato yuz berdi...";
-            });
-        }
-
-        function dispatchOrder() {
-            if(!encodedReceipt) {
-                alert("Iltimos, davom etish uchun avval to'lov cheki (skrinshotini) yuklang!");
+        function submitCurrentOrder() {
+            if(!base64File) {
+                alert("Iltimos, avval to'lov chekini yuklang!");
                 return;
             }
+            
+            document.getElementById('btn-submit-order').disabled = true;
+            document.getElementById('btn-submit-order').innerText = "Yuborilmoqda...";
 
-            const btn = document.getElementById('final-pay-btn');
-            btn.innerText = "Yuborilmoqda...";
-            btn.disabled = true;
-
-            fetch(`${REPLIT_HOST}/api/order`, {
+            fetch(`${BACKEND_URL}/api/orders`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    user_id: currentUserId,
-                    init_data: tg.initData,
+                    userId: currentUserId,
+                    initData: tg.initData,
                     order: orderDraft,
-                    receipt: encodedReceipt
+                    fileData: base64File
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    monitorOrderStatus(data.order_id);
+                    startTrackingStatus(data.orderId);
                 } else {
-                    alert("Buyurtma yuborishda muammo yuz berdi.");
-                    btn.innerText = "To'lovni tasdiqlash";
-                    btn.disabled = false;
+                    alert("Xatolik: " + data.message);
+                    document.getElementById('btn-submit-order').disabled = false;
+                    document.getElementById('btn-submit-order').innerText = "To'lovni tasdiqlash";
                 }
             })
             .catch(() => {
-                alert("Backend ulanish xatosi.");
-                btn.innerText = "To'lovni tasdiqlash";
-                btn.disabled = false;
+                alert("Server bilan aloqa uzildi.");
+                document.getElementById('btn-submit-order').disabled = false;
+                document.getElementById('btn-submit-order').innerText = "To'lovni tasdiqlash";
             });
         }
 
-        function monitorOrderStatus(id) {
-            viewTransition('scr-status');
-            const loop = setInterval(() => {
-                fetch(`${REPLIT_HOST}/api/order-status?order_id=${id}`)
-                .then(res => res.json())
-                .then(resData => {
-                    const icon = document.getElementById('status-icon');
-                    const head = document.getElementById('status-headline');
-                    const body = document.getElementById('status-body');
-                    const gate = document.getElementById('status-interactive-gate');
+        function startTrackingStatus(orderId) {
+            showScreen('scr-status-tracker');
+            
+            // Premium (Self) turi uchun maxsus boshlang'ich matnni sozlash
+            if(orderDraft.type === 'Telegram Premium') {
+                document.getElementById('status-title').innerText = "To'lovingiz qayta ishlashga yuborildi";
+                document.getElementById('status-message').innerText = "Iltimos, admin tasdiqlashini kuting!";
+            } else {
+                document.getElementById('status-title').innerText = "To'lovingiz qayta ishlashga yuborildi";
+                document.getElementById('status-message').innerText = "Iltimos, admin tasdiqlashini kuting. Sabringiz uchun Rahmat!";
+            }
+            
+            document.getElementById('dynamic-interaction-area').innerHTML = '';
 
-                    if(resData.status === 'approved') {
+            const interval = setInterval(() => {
+                fetch(`${BACKEND_URL}/api/orders/${orderId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const icon = document.getElementById('status-icon');
+                    const title = document.getElementById('status-title');
+                    const msg = document.getElementById('status-message');
+                    const interactiveArea = document.getElementById('dynamic-interaction-area');
+
+                    if(data.status === 'approved') {
                         icon.innerText = "✅";
-                        head.innerText = "Tasdiqlandi!";
-                        body.innerText = "To'lovingiz qabul qilindi. Buyurtma tez fursatda yetkaziladi.";
-                        clearInterval(loop);
-                    } else if(resData.status === 'shipped') {
-                        icon.innerText = "🎉";
-                        head.innerText = "Yetkazildi!";
-                        body.innerText = "Sizning buyurtmangiz muvaffaqiyatli muomalaga kiritildi. Rahmat!";
-                        if(resData.screenshot) {
-                            gate.innerHTML = `<img src="${resData.screenshot}" style="width:100%; border-radius:12px; margin-top:12px;" />`;
+                        if(data.type === 'Telegram Premium') {
+                            title.innerText = "To'lovingiz tasdiqlandi";
+                            msg.innerText = "Bog'lanish uchun username qoldiring:";
+                            if(!document.getElementById('username-collect-form')) {
+                                interactiveArea.innerHTML = `
+                                    <div id="username-collect-form" style="margin-top:10px;">
+                                        <div class="input-box" style="margin-bottom:10px;"><input type="text" id="contact-user-input" placeholder="@usernameingizni yozing..."></div>
+                                        <button class="action-btn" onclick="submitContactUsername('${orderId}')">Yuborish</button>
+                                    </div>`;
+                            }
+                            clearInterval(interval);
+                        } else {
+                            title.innerText = "To'lovingiz tasdiqlandi";
+                            msg.innerText = "Buyurtmangiz tez orada o'z manziliga yuboriladi";
                         }
-                        clearInterval(loop);
-                    } else if(resData.status === 'rejected') {
+                    } else if(data.status === 'shipped') {
+                        icon.innerText = "🎉";
+                        title.innerText = "Buyurtma o'z manziliga yuborildi";
+                        msg.innerText = "Bizni tanlaganingiz uchun tashakkur! Keyingi haridlarni kutib qolamiz";
+                        if(data.screenshot) {
+                            interactiveArea.innerHTML = `<img src="${data.screenshot}" style="width:100%; border-radius:12px; margin-top:10px; border:1px solid var(--border-color);" />`;
+                        }
+                        clearInterval(interval);
+                    } else if(data.status === 'rejected') {
                         icon.innerText = "❌";
-                        head.innerText = "Rad etildi";
-                        body.innerText = "To'lov hisoboti bekor qilindi. Muammo bo'lsa texnik yordamga yozing.";
-                        gate.innerHTML = `<button class="action-btn" style="background:#ef4444;" onclick="window.open('https://t.me/saiduz')">Yordam olish (Support)</button>`;
-                        clearInterval(loop);
+                        title.innerText = "To'lovingiz rad etildi";
+                        msg.innerText = "Buni xatolik deb hisoblasangiz qo'llab-quvvatlash xizmatiga murojaat qiling!";
+                        interactiveArea.innerHTML = `<button class="action-btn" style="background:#ff3b30;" onclick="window.open('https://t.me/saiduz')">👨🏻‍💻 Support</button>`;
+                        clearInterval(interval);
                     }
                 });
             }, 3000);
         }
+
+        function submitContactUsername(orderId) {
+            const user = document.getElementById('contact-user-input').value.trim();
+            if(!user) { alert("Username kiritish majburiy!"); return; }
+            
+            fetch(`${BACKEND_URL}/api/orders/${orderId}/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    tg.close();
+                }
+            });
+        }
+
+        function switchNavTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tab}`).classList.add('active');
+
+            if(tab === 'main') {
+                switchMainSection(activeMainSection);
+            } else {
+                document.getElementById('top-tabs-container').style.display = 'none';
+                showScreen(`scr-${tab}`);
+                if(tab === 'referral') loadReferrals();
+                if(tab === 'rating') loadRatings();
+                if(tab === 'history') loadHistory();
+            }
+        }
+
+        function loadReferrals() {
+            fetch(`${BACKEND_URL}/api/referrals?userId=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('ref-link-field').value = data.referralLink;
+                const container = document.getElementById('referral-leaderboard');
+                container.innerHTML = '';
+                data.top.forEach((u, i) => {
+                    container.innerHTML += `<div class="ranking-item"><span>${i+1}. ${u.username || 'Foydalanuvchi'}</span><span style="color:var(--accent-blue)">${u.points} ball</span></div>`;
+                });
+            });
+        }
+
+        function loadRatings() {
+            fetch(`${BACKEND_URL}/api/ratings`)
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('purchase-leaderboard');
+                container.innerHTML = '';
+                data.top.forEach((u, i) => {
+                    container.innerHTML += `<div class="ranking-item"><span>${i+1}. ${u.username || 'Foydalanuvchi'}</span><span style="color:var(--success-green)">${u.score} ball</span></div>`;
+                });
+            });
+        }
+
+        function loadHistory() {
+            fetch(`${BACKEND_URL}/api/history?userId=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('history-container');
+                container.innerHTML = '';
+                if(data.orders.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">Xaridlar topilmadi</div>';
+                    return;
+                }
+                data.orders.forEach(o => {
+                    container.innerHTML += `
+                        <div style="background:var(--bg-input); padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:13px; line-height:1.4;">
+                            <div style="display:flex; justify-content:between; font-weight:bold;"><span>${o.type}</span> <span style="margin-left:auto; color:var(--accent-blue);">${o.status.toUpperCase()}</span></div>
+                            <div style="color:var(--text-muted); margin-top:4px;">Narxi: ${o.price.toLocaleString()} so'm</div>
+                        </div>`;
+                });
+            });
+        }
+
+        // Init
+        renderStarsList();
     </script>
 </body>
 </html>
