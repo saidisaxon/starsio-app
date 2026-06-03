@@ -3,442 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Stars & Premium Store</title>
+    <title>Tez Star — Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #f2f2f7;
-            --surface-color: #ffffff;
-            --text-color: #000000;
-            --text-secondary: #8e8e93;
-            --primary-color: #007aff;
-            --border-color: #c6c6c8;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-blue: #248bf2;
+            --accent-gradient: linear-gradient(135deg, #2897f3 0%, #1772e6 100%);
+            --green-banner: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --purple-banner: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             margin: 0;
             padding: 16px;
+            padding-bottom: 90px; /* Navigatsiya uchun bo'shliq */
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        .tabs {
+        /* Top Bar Tabs */
+        .top-tabs {
             display: flex;
-            background: #e3e3e9;
-            padding: 2px;
-            border-radius: 9px;
-            margin-bottom: 20px;
+            background: #131c2e;
+            padding: 3px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
         }
         .tab-btn {
             flex: 1;
             border: none;
             background: transparent;
-            padding: 8px;
+            padding: 10px;
             font-size: 15px;
             font-weight: 600;
-            border-radius: 7px;
+            border-radius: 18px;
+            color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
         }
         .tab-btn.active {
-            background: var(--surface-color);
-            box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(36, 139, 242, 0.3);
         }
 
-        .screen { display: none; }
-        .screen.active { display: block; }
-        
-        .ios-list {
-            background: var(--surface-color);
-            border-radius: 10px;
-            padding: 0;
-            margin: 0 0 20px 0;
-            list-style: none;
+        /* Dynamic Banners */
+        .banner {
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            position: relative;
             overflow: hidden;
         }
-        .ios-item {
-            padding: 14px 166px;
-            padding: 14px 16px;
+        .banner-green { background: var(--green-banner); }
+        .banner-purple { background: var(--purple-banner); }
+        .banner span {
+            display: block;
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* Main Big Feature Card */
+        .hero-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .hero-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+        }
+        .hero-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+        .hero-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        /* Forms & Inputs */
+        .input-box {
+            background: #131c2e;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .input-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 15px;
+            flex: 1;
+        }
+        .input-box input::placeholder { color: #576574; }
+
+        .inline-action {
+            background: rgba(36, 139, 242, 0.15);
+            color: var(--accent-blue);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* iOS List Tiers */
+        .tier-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .tier-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 0.5px solid var(--border-color);
+            font-weight: 600;
+            font-size: 15px;
+            transition: transform 0.1s ease;
             cursor: pointer;
         }
-        .ios-item:last-child { border-bottom: none; }
-        .ios-item:active { background-color: #e5e5ea; }
+        .tier-item:active { transform: scale(0.98); background: #223147; }
+        .tier-item .amount { display: flex; align-items: center; gap: 8px; }
+        .tier-item .price { color: var(--text-main); background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
 
-        .input-group {
-            display: flex;
-            background: var(--surface-color);
-            border-radius: 10px;
-            padding: 8px 12px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        .ios-input {
-            border: none;
-            outline: none;
-            flex: 1;
-            font-size: 16px;
-        }
-        .inline-btn {
-            background: #e1f0ff;
-            color: var(--primary-color);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .ios-btn {
-            background: var(--primary-color);
+        /* Action Buttons */
+        .action-btn {
+            background: var(--accent-gradient);
             color: white;
-            text-align: center;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
             border: none;
             width: 100%;
-            margin-top: 15px;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(36, 139, 242, 0.4);
+        }
+        .action-btn:active { opacity: 0.9; }
+
+        /* Bottom Tab Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #090d16;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)) 0;
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
             cursor: pointer;
         }
-        .ios-btn:active { opacity: 0.8; }
-        
-        .back-btn {
-            color: var(--primary-color);
+        .nav-item.active { color: var(--accent-blue); }
+        .nav-icon { font-size: 20px; }
+
+        /* Utils */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .back-link {
+            color: var(--accent-blue);
+            font-size: 15px;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
+            margin-bottom: 16px;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 15px;
-            font-weight: 500;
         }
-
-        .card-details {
-            background: var(--surface-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .status-box {
-            text-align: center;
-            padding: 40px 20px;
-            font-size: 18px;
-            font-weight: 500;
-        }
-        
-        .file-label {
+        .file-upload-label {
             display: block;
-            background: #f2f2f7;
+            background: #131c2e;
             border: 1px dashed var(--border-color);
-            padding: 20px;
-            border-radius: 10px;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            color: var(--text-muted);
+            margin: 20px 0;
             cursor: pointer;
-            margin-top: 15px;
-            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
 
-    <div id="main-tabs" class="tabs">
-        <button id="tab-stars" class="tab-btn active" onclick="switchTab('stars')">⭐ Stars</button>
-        <button id="tab-premium" class="tab-btn" onclick="switchTab('premium')">💎 Premium</button>
+    <div id="top-tabs-container" class="top-tabs">
+        <button id="tab-stars" class="tab-btn active" onclick="switchMode('stars')">Stars</button>
+        <button id="tab-premium" class="tab-btn" onclick="switchMode('premium')">Premium</button>
     </div>
 
-    <div id="sec-stars" class="screen active">
-        <div class="input-group">
-            <input type="text" id="stars-username" class="ios-input" placeholder="Username kiriting">
-            <button class="inline-btn" onclick="fillOwnUsername('stars-username')">O'zim uchun</button>
+    <div id="scr-stars" class="screen active">
+        <div class="banner banner-purple">
+            Endi Uzum Bank orqali ham
+            <span>Yangi to'lov usuli ›</span>
         </div>
-        <ul class="ios-list" id="stars-rates-list"></ul>
-    </div>
-
-    <div id="sec-premium" class="screen">
-        <ul class="ios-list">
-            <li class="ios-item" onclick="openPremiumSub('telegram')">
-                <span>💎 Telegram Premium</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </li>
-            <li class="ios-item" onclick="openPremiumSub('gift')">
-                <span>🎁 Gift Premium</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </li>
-        </ul>
-    </div>
-
-    <div id="sec-premium-telegram" class="screen">
-        <div class="back-btn" onclick="goBack('sec-premium')">‹ Ortga</div>
-        <ul class="ios-list">
-            <li class="ios-item" onclick="selectPremiumOption('Telegram Premium 1 oy', 41990)">
-                <span>1 oy</span><span>41,990 so'm</span>
-            </li>
-            <li class="ios-item" onclick="selectPremiumOption('Telegram Premium 12 oy', 294990)">
-                <span>12 oy</span><span>294,990 so'm</span>
-            </li>
-        </ul>
-    </div>
-
-    <div id="sec-premium-gift" class="screen">
-        <div class="back-btn" onclick="goBack('sec-premium')">‹ Ortga</div>
-        <div class="input-group">
-            <input type="text" id="gift-username" class="ios-input" placeholder="Username kiriting">
-            <button class="inline-btn" onclick="fillOwnUsername('gift-username')">O'zim uchun</button>
+        <div class="hero-card">
+            <div class="hero-icon">⭐</div>
+            <h2 class="hero-title">Telegram Stars olish</h2>
+            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Stars balansini to'ldiring — qulay to'lov usullari va hatto naqd pul bilan ham.</p>
+            <div class="input-box">
+                <input type="text" id="stars-username" placeholder="@username kiriting...">
+                <button class="inline-action" onclick="fillMe('stars-username')">O'zimga</button>
+            </div>
+            <button class="action-btn" onclick="showStarsTiers()">Stars olish</button>
         </div>
-        <ul class="ios-list">
-            <li class="ios-item" onclick="selectGiftOption('Gift Premium 3 oy', 165990)">
-                <span>3 oy</span><span>165,990 so'm</span>
+    </div>
+
+    <div id="scr-premium" class="screen">
+        <div class="banner banner-green">
+            Naqd pul bilan ham olishingiz mumkin
+            <span>Paynet terminal orqali ›</span>
+        </div>
+        <div class="hero-card">
+            <div class="hero-icon">💙</div>
+            <h2 class="hero-title">Telegram Premium</h2>
+            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Premium obuna.</p>
+            <button class="action-btn" onclick="showPremiumTiers()">Premium olish</button>
+        </div>
+    </div>
+
+    <div id="scr-stars-tiers" class="screen">
+        <div class="back-link" onclick="goBack('scr-stars')">‹ Ortga</div>
+        <h3 style="margin-bottom:16px;">To'plamni tanlang</h3>
+        <ul class="tier-list" id="stars-render-area"></ul>
+    </div>
+
+    <div id="scr-premium-tiers" class="screen">
+        <div class="back-link" onclick="goBack('scr-premium')">‹ Ortga</div>
+        <h3 style="margin-bottom:16px;">Obuna turini tanlang</h3>
+        <ul class="tier-list">
+            <li class="tier-item" onclick="openPremiumSubform('Telegram Premium (O\'ziga)', [
+                {label: '1 oy obuna', cost: 41990, title: 'Premium 1 Oy'},
+                {label: '12 oy obuna (Chegirma)', cost: 294990, title: 'Premium 12 Oy'}
+            ], false)">
+                <div class="amount">💎 Shaxsiy obuna (In-App)</div>
+                <div>›</div>
             </li>
-            <li class="ios-item" onclick="selectGiftOption('Gift Premium 6 oy', 224990)">
-                <span>6 oy</span><span>224,990 so'm</span>
-            </li>
-            <li class="ios-item" onclick="selectGiftOption('Gift Premium 12 oy', 394990)">
-                <span>12 oy</span><span>394,990 so'm</span>
+            <li class="tier-item" onclick="openPremiumSubform('Gift Premium (Sog\'g\'a)', [
+                {label: '3 oy Premium Sovg\'a', cost: 165990, title: 'Gift Premium 3 Oy'},
+                {label: '6 oy Premium Sovg\'a', cost: 224990, title: 'Gift Premium 6 Oy'},
+                {label: '12 oy Premium Sovg\'a', cost: 394990, title: 'Gift Premium 12 Oy'}
+            ], true)">
+                <div class="amount">🎁 Sovg'a tariqasida (Gift)</div>
+                <div>›</div>
             </li>
         </ul>
     </div>
 
-    <div id="sec-payment" class="screen">
-        <div class="back-btn" id="pay-back-btn">‹ Ortga</div>
-        <div class="card-details">
-            <h3 style="margin-top:0;">To'lov bo'limi</h3>
-            <p id="pay-item-details" style="font-weight:600; color:var(--primary-color); white-space: pre-line;"></p>
-            <div style="font-size:20px; font-weight:bold; margin:15px 0;" id="pay-card-num">5614 6828 8568 7642</div>
-            <button class="inline-btn" onclick="copyCard()">Nusxalash</button>
-            <div style="margin-top:10px; color:var(--text-secondary)" id="pay-card-holder">Matlabov Saidisaxon</div>
+    <div id="scr-dynamic-subtiers" class="screen">
+        <div class="back-link" onclick="goBack('scr-premium-tiers')">‹ Ortga</div>
+        <h3 id="dynamic-tier-title" style="margin-bottom:16px;">Muddatni tanlang</h3>
+        <div id="dynamic-username-block" class="input-box" style="display:none;">
+            <input type="text" id="premium-gift-user" placeholder="@username kiriting...">
+            <button class="inline-action" onclick="fillMe('premium-gift-user')">O'zimga</button>
+        </div>
+        <ul class="tier-list" id="dynamic-render-area"></ul>
+    </div>
+
+    <div id="scr-checkout" class="screen">
+        <div class="back-link" id="checkout-back-hook">‹ Ortga</div>
+        <div class="hero-card" style="text-align:left; padding:20px;">
+            <h3 style="margin-top:0; text-align:center;">To'lov bo'limi</h3>
+            <p id="checkout-meta" style="font-size:14px; color:var(--text-muted); line-height:1.6; border-bottom:1px solid var(--border-color); padding-bottom:12px;"></p>
             
-            <label class="file-label">
-                <span id="file-status">📁 Faylni yuklash (Chek rasmi)</span>
-                <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleFile(this)">
+            <div style="text-align:center; padding:15px 0;">
+                <span style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">KARTA RAQAMI</span>
+                <div style="font-size:22px; font-weight:bold; letter-spacing:1px; color:white;" id="card-display">5614 6828 8568 7642</div>
+                <button class="inline-action" style="margin-top:8px;" onclick="copyCardNum()">Nusxalash</button>
+                <div style="font-size:14px; color:var(--text-muted); margin-top:8px;">Matlabov Saidisaxon</div>
+            </div>
+
+            <label class="file-upload-label">
+                <span id="upload-label-text">📁 To'lov chekini yuklash (Rasm)</span>
+                <input type="file" id="receipt-file" accept="image/*" style="display:none;" onchange="processFile(this)">
             </label>
-            <button class="ios-btn" id="submit-pay-btn" onclick="submitPayment()">To'lovni tasdiqlash</button>
+
+            <button class="action-btn" id="final-pay-btn" onclick="dispatchOrder()">To'lovni tasdiqlash</button>
         </div>
     </div>
 
-    <div id="sec-status" class="screen">
-        <div class="card-details status-box" id="status-text">
-            To'lovingiz qayta ishlashga yuborildi. Iltimos, admin tasdiqlashini kuting. Sabringiz uchun Rahmat!
+    <div id="scr-status" class="screen">
+        <div class="hero-card">
+            <div class="hero-icon" id="status-icon">⏳</div>
+            <h3 id="status-headline">To'lov yuborildi</h3>
+            <p id="status-body" class="hero-desc">Sizning to'lovingiz tizim administratorlari tomonidan tekshirilmoqda. Iltimos sahifani yopmang yoki kuting.</p>
+            <div id="status-interactive-gate"></div>
         </div>
-        <div id="dynamic-action-area"></div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" id="nav-home" onclick="switchMode('stars')">
+            <span class="nav-icon">⭐</span>Tez Star
+        </button>
+        <button class="nav-item" onclick="alert('Tez orada...')">
+            <span class="nav-icon">👥</span>Referral
+        </button>
+        <button class="nav-item" onclick="alert('Hamyon hozircha faol emas')">
+            <span class="nav-icon">💼</span>Hamyon
+        </button>
+        <button class="nav-item" onclick="alert('Tariq bo\'sh')">
+            <span class="nav-icon">🕒</span>Tarix
+        </button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        // Aniq Replit backend URL manzili shu yerga kiritildi:
-        const BACKEND_URL = "https://d2ec0b89-bc7d-45d1-a016-57d6904008b1-00-2x1s0wvp9le2k.sisko.replit.dev"; 
+        const REPLIT_HOST = "https://d2ec0b89-bc7d-45d1-a016-57d6904008b1-00-2x1s0wvp9le2k.sisko.replit.dev";
 
-        let currentOrder = {};
-        let historyStack = [];
-        let base64File = null;
+        let orderDraft = {};
+        let uiStack = [];
+        let encodedReceipt = null;
 
-        const starsRates = [50, 100, 200, 500, 1000, 1500];
-        const starsPricePerUnit = 220;
+        const starPricing = [
+            {qty: 50, price: 12999},
+            {qty: 100, price: 25999},
+            {qty: 500, price: 129999},
+            {qty: 1000, price: 255000},
+            {qty: 5000, price: 1250000}
+        ];
 
-        function initStars() {
-            const list = document.getElementById('stars-rates-list');
-            list.innerHTML = '';
-            starsRates.forEach(amt => {
-                const price = amt * starsPricePerUnit;
-                const li = document.createElement('li');
-                li.className = 'ios-item';
-                li.innerHTML = `<span>⭐ ${amt.toLocaleString()} Stars</span><span>${price.toLocaleString()} so'm</span>`;
-                li.onclick = () => selectStarsOption(amt, price);
-                list.appendChild(li);
-            });
-            const customLi = document.createElement('li');
-            customLi.className = 'ios-item';
-            customLi.innerHTML = `<span style="color:var(--primary-color)">Boshqa miqdor</span><span>›</span>`;
-            customLi.onclick = () => customStarsAmount();
-            list.appendChild(customLi);
+        function switchMode(mode) {
+            document.getElementById('tab-stars').classList.toggle('active', mode === 'stars');
+            document.getElementById('tab-premium').classList.toggle('active', mode === 'premium');
+            document.getElementById('scr-stars').classList.toggle('active', mode === 'stars');
+            document.getElementById('scr-premium').classList.toggle('active', mode === 'premium');
+            document.getElementById('nav-home').classList.toggle('active', true);
+            uiStack = [];
+            document.getElementById('top-tabs-container').style.display = 'flex';
         }
 
-        function switchTab(tab) {
-            document.getElementById('tab-stars').classList.toggle('active', tab === 'stars');
-            document.getElementById('tab-premium').classList.toggle('active', tab === 'premium');
-            document.getElementById('sec-stars').classList.toggle('active', tab === 'stars');
-            document.getElementById('sec-premium').classList.toggle('active', tab === 'premium');
-            historyStack = [];
-        }
-
-        function fillOwnUsername(inputId) {
-            const user = tg.initDataUnsafe?.user?.username;
-            if(user) {
-                document.getElementById(inputId).value = '@' + user;
+        function fillMe(targetFieldId) {
+            const username = tg.initDataUnsafe?.user?.username;
+            if(username) {
+                document.getElementById(targetFieldId).value = '@' + username;
             } else {
-                alert("Telegram username topilmadi.");
+                alert("Sizda ommaviy username sozlanmagan.");
             }
         }
 
-        function navigateTo(screenId) {
+        function viewTransition(targetScreenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('main-tabs').style.display = (screenId === 'sec-stars' || screenId === 'sec-premium') ? 'flex' : 'none';
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function openPremiumSub(type) {
-            historyStack.push('sec-premium');
-            navigateTo('sec-premium-' + type);
-        }
-
-        function goBack(fallbackScreen) {
-            const prev = historyStack.pop() || fallbackScreen;
-            navigateTo(prev);
-        }
-
-        function selectStarsOption(amount, price) {
-            const username = document.getElementById('stars-username').value.trim();
-            if(!username) { alert("Iltimos, username kiriting!"); return; }
-            currentOrder = { type: 'Stars', amount: amount, price: price, username: username };
-            openPaymentView('sec-stars');
-        }
-
-        function customStarsAmount() {
-            const username = document.getElementById('stars-username').value.trim();
-            if(!username) { alert("Iltimos, username kiriting!"); return; }
-            const amt = prompt("Kiritmoqchi bo'lgan Stars miqdoringizni yozing:");
-            if(!amt || isNaN(amt) || parseInt(amt) <= 0) return;
-            const parsedAmt = parseInt(amt);
-            const price = parsedAmt * starsPricePerUnit;
-            currentOrder = { type: 'Stars', amount: parsedAmt, price: price, username: username };
-            openPaymentView('sec-stars');
-        }
-
-        function selectPremiumOption(title, price) {
-            currentOrder = { type: 'Telegram Premium', title: title, price: price, username: 'In-App (O\'zi uchun)' };
-            openPaymentView('sec-premium-telegram');
-        }
-
-        function selectGiftOption(title, price) {
-            const username = document.getElementById('gift-username').value.trim();
-            if(!username) { alert("Iltimos, username kiriting!"); return; }
-            currentOrder = { type: 'Gift Premium', title: title, price: price, username: username };
-            openPaymentView('sec-premium-gift');
-        }
-
-        function openPaymentView(backScreen) {
-            historyStack.push(backScreen);
-            document.getElementById('pay-back-btn').onclick = () => goBack(backScreen);
+            document.getElementById(targetScreenId).classList.add('active');
             
-            const detailText = currentOrder.type === 'Stars' ? 
-                `⭐ ${currentOrder.amount} Stars - ${currentOrder.price.toLocaleString()} so'm` : 
-                `${currentOrder.title} - ${currentOrder.price.toLocaleString()} so'm`;
-                
-            document.getElementById('pay-item-details').innerText = detailText + `\nFoydalanuvchi: ${currentOrder.username}`;
-            document.getElementById('file-status').innerText = "📁 Faylni yuklash (Chek rasmi)";
-            document.getElementById('file-input').value = "";
-            base64File = null; 
-            navigateTo('sec-payment');
+            const showTop = ['scr-stars', 'scr-premium'].includes(targetScreenId);
+            document.getElementById('top-tabs-container').style.display = showTop ? 'flex' : 'none';
         }
 
-        function copyCard() {
-            const cardNum = document.getElementById('pay-card-num').innerText.replace(/\s/g, '');
-            navigator.clipboard.writeText(cardNum);
+        function goBack(fallback) {
+            const previous = uiStack.pop() || fallback;
+            viewTransition(previous);
+        }
+
+        function showStarsTiers() {
+            const user = document.getElementById('stars-username').value.trim();
+            if(!user) { alert("Iltimos, avval username kiriting!"); return; }
+            
+            const container = document.getElementById('stars-render-area');
+            container.innerHTML = '';
+            
+            starPricing.forEach(tier => {
+                const li = document.createElement('li');
+                li.className = 'tier-item';
+                li.innerHTML = `<div class="amount">⭐ ${tier.qty.toLocaleString()} Stars</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
+                li.onclick = () => {
+                    orderDraft = { type: 'Stars', amount: tier.qty, price: tier.price, username: user };
+                    triggerCheckout('scr-stars-tiers');
+                };
+                container.appendChild(li);
+            });
+            
+            uiStack.push('scr-stars');
+            viewTransition('scr-stars-tiers');
+        }
+
+        function showPremiumTiers() {
+            uiStack.push('scr-premium');
+            viewTransition('scr-premium-tiers');
+        }
+
+        function openPremiumSubform(categoryTitle, subTiers, requiresUsername) {
+            document.getElementById('dynamic-tier-title').innerText = categoryTitle;
+            const userBlock = document.getElementById('dynamic-username-block');
+            userBlock.style.display = requiresUsername ? 'flex' : 'none';
+            
+            const container = document.getElementById('dynamic-render-area');
+            container.innerHTML = '';
+
+            subTiers.forEach(sub => {
+                const li = document.createElement('li');
+                li.className = 'tier-item';
+                li.innerHTML = `<div class="amount">💎 ${sub.label}</div><div class="price">${sub.cost.toLocaleString()} so'm</div>`;
+                li.onclick = () => {
+                    let targetUser = "In-App Account";
+                    if(requiresUsername) {
+                        targetUser = document.getElementById('premium-gift-user').value.trim();
+                        if(!targetUser) { alert("Iltimos, sovg'a yuboriladigan foydalanuvchi username'sini yozing!"); return; }
+                    }
+                    orderDraft = { type: 'Premium', title: sub.title, price: sub.cost, username: targetUser };
+                    triggerCheckout('scr-dynamic-subtiers');
+                };
+                container.appendChild(li);
+            });
+
+            uiStack.push('scr-premium-tiers');
+            viewTransition('scr-dynamic-subtiers');
+        }
+
+        function triggerCheckout(backScreenHook) {
+            uiStack.push(backScreenHook);
+            document.getElementById('checkout-back-hook').onclick = () => goBack(backScreenHook);
+
+            const metaStr = orderDraft.type === 'Stars' ? 
+                `Xizmat turi: Telegram Stars\nMiqdori: ⭐ ${orderDraft.amount} Stars\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}` :
+                `Xizmat turi: Telegram Premium Obuna\nPaket: ${orderDraft.title}\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}`;
+            
+            document.getElementById('checkout-meta').innerText = metaStr;
+            document.getElementById('upload-label-text').innerText = "📁 To'lov chekini yuklash (Rasm)";
+            document.getElementById('receipt-file').value = '';
+            encodedReceipt = null;
+
+            viewTransition('scr-checkout');
+        }
+
+        function copyCardNum() {
+            const num = document.getElementById('card-display').innerText.replace(/\s/g, '');
+            navigator.clipboard.writeText(num);
             alert("Karta raqami nusxalandi!");
         }
 
-        function handleFile(input) {
-            if(input.files && input.files[0]) {
-                document.getElementById('file-status').innerText = "✅ Chek yuklandi: " + input.files[0].name;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    base64File = e.target.result;
+        function processFile(elem) {
+            if(elem.files && elem.files[0]) {
+                document.getElementById('upload-label-text').innerText = "✅ Chek muvaffaqiyatli yuklandi!";
+                const stream = new FileReader();
+                stream.onload = function(evt) {
+                    encodedReceipt = evt.target.result;
                 };
-                reader.readAsDataURL(input.files[0]);
+                stream.readAsDataURL(elem.files[0]);
             }
         }
 
-        function submitPayment() {
-            if(!base64File) { 
-                alert("Iltimos, avval to'lov chekini yuklang (Faylni yuklash tugmasi)!"); 
-                return; 
+        function dispatchOrder() {
+            if(!encodedReceipt) {
+                alert("Iltimos, davom etish uchun avval to'lov cheki (skrinshotini) yuklang!");
+                return;
             }
-            
-            document.getElementById('submit-pay-btn').innerText = "Yuborilmoqda...";
-            document.getElementById('submit-pay-btn').disabled = true;
 
-            fetch(`${BACKEND_URL}/api/order`, {
+            const btn = document.getElementById('final-pay-btn');
+            btn.innerText = "Yuborilmoqda...";
+            btn.disabled = true;
+
+            fetch(`${REPLIT_HOST}/api/order`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    user_id: tg.initDataUnsafe?.user?.id || "8906567040", 
+                    user_id: tg.initDataUnsafe?.user?.id || "DEBUG_USER",
                     init_data: tg.initData,
-                    order: currentOrder,
-                    receipt: base64File
+                    order: orderDraft,
+                    receipt: encodedReceipt
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    listenToStatusUpdates(data.order_id);
+                    monitorOrderStatus(data.order_id);
                 } else {
-                    alert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
-                    document.getElementById('submit-pay-btn').innerText = "To'lovni tasdiqlash";
-                    document.getElementById('submit-pay-btn').disabled = false;
+                    alert("Buyurtma yuborishda muammo yuz berdi. Qayta urining.");
+                    btn.innerText = "To'lovni tasdiqlash";
+                    btn.disabled = false;
                 }
             })
-            .catch(err => {
-                alert("Backendga ulanishda xato! Replit platformasida loyiha 'Run' bo'lib turganini tekshiring.");
-                document.getElementById('submit-pay-btn').innerText = "To'lovni tasdiqlash";
-                document.getElementById('submit-pay-btn').disabled = false;
+            .catch(() => {
+                alert("Backend ulanish xatosi. Replit serveri ochiqligini tekshiring.");
+                btn.innerText = "To'lovni tasdiqlash";
+                btn.disabled = false;
             });
         }
 
-        function listenToStatusUpdates(orderId) {
-            navigateTo('sec-status');
-            
-            const interval = setInterval(() => {
-                fetch(`${BACKEND_URL}/api/order-status?order_id=${orderId}`)
+        function monitorOrderStatus(id) {
+            viewTransition('scr-status');
+            const loop = setInterval(() => {
+                fetch(`${REPLIT_HOST}/api/order-status?order_id=${id}`)
                 .then(res => res.json())
-                .then(data => {
-                    const statusTextDiv = document.getElementById('status-text');
-                    const actionArea = document.getElementById('dynamic-action-area');
-                    
-                    if (data.status === 'approved') {
-                        if(currentOrder.type === 'Telegram Premium') {
-                            statusTextDiv.innerText = "To'lovingiz tasdiqlandi. Bog'lanish uchun username qoldiring";
-                            actionArea.innerHTML = `
-                                <div class="input-group" style="margin-top:15px;">
-                                    <input type="text" id="post-back-user" class="ios-input" placeholder="Username kiriting">
-                                </div>
-                                <button class="ios-btn" onclick="submitPremiumUsername('${orderId}')">Yuborish</button>
-                            `;
-                            clearInterval(interval);
-                        } else {
-                            statusTextDiv.innerText = "To'lovingiz tasdiqlandi. Buyurtmangiz tez orada o'z manziliga yuboriladi";
+                .then(resData => {
+                    const icon = document.getElementById('status-icon');
+                    const head = document.getElementById('status-headline');
+                    const body = document.getElementById('status-body');
+                    const gate = document.getElementById('status-interactive-gate');
+
+                    if(resData.status === 'approved') {
+                        icon.innerText = "✅";
+                        head.innerText = "Tasdiqlandi!";
+                        body.innerText = "To'lovingiz qabul qilindi. Buyurtma tez fursatda yetkaziladi.";
+                        clearInterval(loop);
+                    } else if(resData.status === 'shipped') {
+                        icon.innerText = "🎉";
+                        head.innerText = "Yetkazildi!";
+                        body.innerText = "Sizning buyurtmangiz muvaffaqiyatli muomalaga kiritildi. Rahmat!";
+                        if(resData.screenshot) {
+                            gate.innerHTML = `<img src="${resData.screenshot}" style="width:100%; border-radius:12px; margin-top:12px;" />`;
                         }
-                    } else if (data.status === 'shipped') {
-                        statusTextDiv.innerHTML = `<img src="${data.screenshot}" style="width:100%; border-radius:8px; margin-bottom:10px;" /><br>Buyurtma o'z manziliga yuborildi. Bizni tanlaganingiz uchun tashakkur! Keyingi haridlarni kutib qolamiz`;
-                        clearInterval(interval);
-                    } else if (data.status === 'rejected') {
-                        statusTextDiv.innerText = "To'lovingiz rad etildi. Buni xatolik deb hisoblasangiz qo'llab-quvvatlash xizmatiga murojaat qiling!";
-                        actionArea.innerHTML = `<button class="ios-btn" style="background:#ff3b30;" onclick="window.open('https://t.me/saiduz', '_blank')">👨🏻‍💻 Support</button>`;
-                        clearInterval(interval);
+                        clearInterval(loop);
+                    } else if(resData.status === 'rejected') {
+                        icon.innerText = "❌";
+                        head.innerText = "Rad etildi";
+                        body.innerText = "To'lov hisoboti bekor qilindi. Muammo bo'lsa texnik yordamga yozing.";
+                        gate.innerHTML = `<button class="action-btn" style="background:#ef4444;" onclick="window.open('https://t.me/saiduz')">Yordam olish (Support)</button>`;
+                        clearInterval(loop);
                     }
                 });
             }, 3000);
         }
-
-        function submitPremiumUsername(orderId) {
-            const user = document.getElementById('post-back-user').value.trim();
-            if(!user) return;
-            fetch(`${BACKEND_URL}/api/premium-username`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ order_id: orderId, username: user })
-            }).then(() => {
-                tg.close();
-            });
-        }
-
-        initStars();
     </script>
 </body>
 </html>
