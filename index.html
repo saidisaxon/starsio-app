@@ -1,31 +1,109 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root { --tg-blue: #2481cc; --bg: #0f0f0f; }
-        body { background: var(--bg); color: white; padding: 15px; font-family: sans-serif; }
-        h1, h3 { color: var(--tg-blue); text-align: center; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { width: 100%; padding: 15px 5px; border: none; border-radius: 10px; background: #1c1c1c; 
-                 color: var(--tg-blue); font-weight: bold; border: 1px solid var(--tg-blue); cursor: pointer; }
-        .page { display: none; } .active { display: block; }
-    </style>
-</head>
-<body>
-    <div id="main" class="page active">
-        <h1>🌟 Starsio Store</h1>
-        <div class="menu-grid">
-            <button onclick="tg.sendData('Premium')">💎 Premium</button>
-            <button onclick="tg.sendData('Gift')">🎁 Gift</button>
-            <button onclick="tg.sendData('Stars')">⭐ Stars</button>
-            <button onclick="window.open('https://t.me/saiduz', '_blank')">👮‍♂️ Yordam</button>
-        </div>
-    </div>
-    <script>
-        let tg = window.Telegram.WebApp; tg.expand();
-    </script>
-</body>
-</html>
+import os
+import json
+import logging
+from fastapi import FastAPI, Request, UploadFile, File, Form
+from fastapi.responses import HTMLResponse, JSONResponse
+from aiogram import Bot, Dispatcher, F, types
+from aiogram.filters import CommandStart
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.memory import MemoryStorage
+import uvicorn
+
+CLIENT_BOT_TOKEN = "8597227588:AAEjBEbcvsSpJryrT9J2XUHwN_JCd0akYks"
+ADMIN_BOT_TOKEN = "8787276035:AAHZQhgqI5WKo8KRQAxJSscnKjV1novrkxA"
+ADMIN_ID = 8906567040
+WEBAPP_URL = "https://your-production-domain.com/webapp" # O'zingizning aniq domen manzilingizni kiriting
+
+client_bot = Bot(token=CLIENT_BOT_TOKEN)
+admin_bot = Bot(token=ADMIN_BOT_TOKEN)
+
+storage = MemoryStorage()
+client_dp = Dispatcher(storage=storage)
+admin_dp = Dispatcher(storage=storage)
+
+app = FastAPI()
+
+class AdminStates(StatesGroup):
+    screenshot = State()
+
+@client_dp.message(CommandStart())
+async def client_start(msg: types.Message):
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Mini-App Do'konini Ochish", web_app=WebAppInfo(url=WEBAPP_URL))]
+    ])
+    await msg.answer("Premium Mini-App do'kondan xarid qilish uchun tugmani bosing:", reply_markup=markup)
+
+@client_dp.message(F.text & ~F.text.startswith("/"))
+async def client_text(msg: types.Message):
+    await msg.answer("Siz qoldirgan username qabul qilindi. Tez orada admin siz bilan boglanadi")
+    await admin_bot.send_message(chat_id=ADMIN_ID, text=f"📂 **Premium manzili:**\nMijoz: @{msg.from_user.username}\nKiritdi: {msg.text}")
+
+@admin_dp.callback_query(F.data.startswith("ok:"))
+async def approve(call: types.CallbackQuery, state: FSMContext):
+    _, uid, o_type = call.data.split(":")
+    uid = int(uid)
+    if o_type in ["Stars", "Gift"]:
+        await client_bot.send_message(chat_id=uid, text="To'lovingiz tasdiqlandi. Buyurtmangiz tez orada berilgan manzilga yuboriladi")
+        await call.message.answer("Mijozga yuboriladigan screenshot (rasm) yuklang:")
+        await state.update_data(c_id=uid)
+        await state.set_state(AdminStates.screenshot)
+    elif o_type == "Premium":
+        await client_bot.send_message(chat_id=uid, text="Tolovingiz tasdiqlandi. Boglanish uchun @username qoldiring!")
+        await call.message.answer("Mijoz botiga bildirishnoma uzatildi.")
+    await call.answer()
+
+@admin_dp.callback_query(F.data.startswith("n:"))
+async def reject(call: types.CallbackQuery):
+    uid = int(call.data.split(":")[1])
+    await client_bot.send_message(chat_id=uid, text="Tolovingiz rad etildi. Buni xatolik deb hisoblasangiz @saiduz ga boglaning")
+    await call.message.answer("Rad etildi.")
+    await call.answer()
+
+@admin_dp.message(AdminStates.screenshot, F.photo)
+async def send_screenshot(msg: types.Message, state: FSMContext):
+    s_data = await state.get_data()
+    cid = s_data.get("c_id")
+    if cid:
+        await client_bot.send_photo(chat_id=cid, photo=msg.photo[-1].file_id, caption="Buyurtmangiz yuborildi. Bizni tanlaganingiz uchun tashakkur! Keyingi haridlarni kutib qolamiz")
+        await msg.answer("Screenshot mijoz botiga yuborildi.")
+    await state.clear()
+
+@app.post("/submit-order")
+async def submit_order(order_data: str = Form(...), file: UploadFile = File(...)):
+    data = json.loads(order_data)
+    user_id = data.get("user_id")
+    username = data.get("username", "Noma'lum")
+    file_bytes = await file.read()
+    input_file = types.BufferedInputFile(file_bytes, filename=file.filename)
+    
+    text = (
+        f"🔔 **Yangi Buyurtma Keldi!**\n\n"
+        f"Mijoz: {username}\n"
+        f"Tur: {data['type']}\n"
+        f"Tafsilot: {data['details']}\n"
+        f"Narxi: {int(data['price']):,} so'm\n"
+        f"Manzil: {data['target']}"
+    )
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"ok:{user_id}:{data['type']}"),
+            InlineKeyboardButton(text="❌ Rad Etish", callback_data=f"no:{user_id}")
+        ]
+    ])
+    await admin_bot.send_photo(chat_id=ADMIN_ID, photo=input_file, caption=text, reply_markup=markup, parse_mode="Markdown")
+    return {"status": "success"}
+
+# --- INDEX.HTML INTEGRATSIYASI ---
+HTML_CONTENT = """<!DOCTYPE html><html lang="uz"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Shop</title><script src="https://telegram.org/js/telegram-web-app.js"></script><script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script><style>body{background-color:#0b0e14;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}.btn{background-color:#007AFF;color:#fff;border-radius:12px}.bg-c{background-color:#161f2c;border-radius:14px;border:1px solid rgba(255,255,255,0.05)}</style></head><body class="p-4 space-y-5"><div id="m" class="space-y-4"><div class="text-center py-2"><h1 class="text-xl font-bold">Asosiy Menu</h1></div><div class="grid grid-cols-2 gap-4"><button onclick="go('s')" class="bg-c p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl"><span>⭐</span><span class="text-xs font-semibold text-gray-200">Telegram Stars</span></button><button onclick="go('p')" class="bg-c p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl"><span>💎</span><span class="text-xs font-semibold text-gray-200">Telegram Premium</span></button><button onclick="go('g')" class="bg-c p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl"><span>🎁</span><span class="text-xs font-semibold text-gray-200">Gift Premium</span></button><button onclick="tg.openTelegramLink('https://t.me/saiduz')" class="bg-c p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xl bg-gradient-to-br from-slate-900 to-red-950/20"><span>👨‍💻</span><span class="text-xs font-semibold text-red-400">Support</span></button></div></div><div id="s" class="hidden space-y-3"><button onclick="go('m')" class="text-xs text-gray-400">⬅️ Orqaga</button><div class="bg-c p-2 flex"><input id="su" placeholder="Username kiritish" class="bg-transparent flex-1 text-sm outline-none px-2"><button onclick="me('su')" class="btn text-xs px-3 py-1.5 font-bold">O'zim uchun</button></div><div class="grid grid-cols-2 gap-2"><button onclick="buy('Stars','50 Stars',11000,'su')" class="bg-c p-4 font-bold text-center text-sm">50 ⭐</button><button onclick="buy('Stars','100 Stars',22000,'su')" class="bg-c p-4 font-bold text-center text-sm">100 ⭐</button><button onclick="buy('Stars','200 Stars',44000,'su')" class="bg-c p-4 font-bold text-center text-sm">200 ⭐</button><button onclick="document.getElementById('cust').classList.remove('hidden')" class="bg-c p-4 font-bold text-center text-xs text-blue-400">✍🏻 Qo'lda</button></div><div id="cust" class="hidden bg-c p-3 space-y-2"><input id="cq" type="number" placeholder="Miqdor" oninput="clc()" class="w-full bg-transparent border-b border-gray-700 outline-none text-sm"><p id="cr" class="text-xs text-green-400">Narxi: 0 so'm</p><button onclick="c_buy()" class="w-full btn text-xs py-2 font-bold">Tasdiqlash</button></div></div><div id="p" class="hidden space-y-3"><button onclick="go('m')" class="text-xs text-gray-400">⬅️ Orqaga</button><button onclick="buy('Premium','1 oy',41990,null)" class="w-full bg-c p-4 font-bold flex justify-between items-center text-sm"><span>1 oy</span><span class="text-blue-400">41,990 so'm</span></button><button onclick="buy('Premium','12 oy',294990,null)" class="w-full bg-c p-4 font-bold flex justify-between items-center text-sm"><span>12 oy</span><span class="text-blue-400">294,990 so'm</span></button></div><div id="g" class="hidden space-y-3"><button onclick="go('m')" class="text-xs text-gray-400">⬅️ Orqaga</button><div class="bg-c p-2 flex"><input id="gu" placeholder="Hadya uchun username" class="bg-transparent flex-1 text-sm outline-none px-2"><button onclick="me('gu')" class="btn text-xs px-3 py-1.5 font-bold">O'zim uchun</button></div><button onclick="buy('Gift','3 oy',165990,'gu')" class="w-full bg-c p-4 font-bold flex justify-between items-center text-sm"><span>3 oy</span><span class="text-purple-400">165,990 so'm</span></button><button onclick="buy('Gift','6 oy',224990,'gu')" class="w-full bg-c p-4 font-bold flex justify-between items-center text-sm"><span>6 oy</span><span class="text-purple-400">224,990 so'm</span></button><button onclick="buy('Gift','12 oy',394990,'gu')" class="w-full bg-c p-4 font-bold flex justify-between items-center text-sm"><span>12 oy</span><span class="text-purple-400">394,990 so'm</span></button></div><div id="py" class="hidden space-y-4"><p id="pd" class="text-xs text-gray-300"></p><div class="bg-slate-900 p-3 rounded-xl flex justify-between items-center border border-gray-800"><div class="text-left"><p class="text-[9px] text-gray-400 uppercase">Karta raqami</p><p id="card" class="font-mono font-bold text-sm text-yellow-400">8600140465749021</p><p class="text-[11px] text-gray-300">Saidov S.</p></div><button onclick="navigator.clipboard.writeText(document.getElementById('card').innerText);alert('Nusxalandi!')" class="bg-emerald-600 text-xs px-2.5 py-1.5 rounded-lg font-bold">Nusxalash</button></div><input type="file" id="f" accept="image/*" class="text-xs text-gray-400"><button onclick="sub()" class="w-full btn p-3.5 font-bold text-sm">To'lovni Tasdiqlash</button></div><div id="st" class="hidden text-center p-6 text-yellow-400 font-bold text-sm">To'lovingiz qayta ishlashga yuborildi. Iltimos, admin tasdiqlashini kuting!</div><script>const tg=window.Telegram.WebApp;tg.expand();let o={};function go(id){['m','s','p','g','py','st'].forEach(p=>{document.getElementById(p).classList.add('hidden')});document.getElementById(id).classList.remove('hidden')}function me(id){const u=tg.initDataUnsafe?.user?.username;if(u)document.getElementById(id).value='@'+u;else alert('Topilmadi')}function clc(){const q=document.getElementById('cq').value;document.getElementById('cr').innerText='Narxi: '+(q*220).toLocaleString()+' so\'m'}function c_buy(){const q=parseInt(document.getElementById('cq').value);const u=document.getElementById('su').value;if(!u||!q)return;o={type:'Stars',details:q+' Stars',price:q*220,target:u};pay()}function buy(t,d,p,uId){const u=uId?document.getElementById(uId).value:'',trg=uId?u:'O\'zi uchun';if(uId&&!u){alert('Username shart');return}o={type:t,details:d,price:p,target:trg};pay()}function pay(){document.getElementById('pd').innerHTML=`Xizmat: ${o.details}<br>Manzil: ${o.target}<br>Summa: ${o.price.toLocaleString()} so'm`;go('py')}function sub(){const fIn=document.getElementById('f');if(!fIn.files[0]){alert('Chek yuklang');return};o.user_id=tg.initDataUnsafe?.user?.id||0;o.username=tg.initDataUnsafe?.user?.username?'@'+tg.initDataUnsafe.user.username:'Foydalanuvchi';const fd=new FormData();fd.append("order_data",JSON.stringify(o));fd.append("file",fIn.files[0]);go('st');fetch('/submit-order',{method:'POST',body:fd})}</script></body></html>"""
+
+@app.get("/webapp")
+def get_web(): return HTMLResponse(HTML_CONTENT)
+
+async def main():
+    server = uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=8000))
+    await asyncio.gather(server.serve(), client_dp.start_polling(client_bot), admin_dp.start_polling(admin_bot))
+
+if __name__ == "__main__":
+    asyncio.run(main())
