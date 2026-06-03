@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Tez Star — Mini App</title>
+    <title>Starsio</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -13,8 +13,8 @@
             --text-muted: #94a3b8;
             --accent-blue: #248bf2;
             --accent-gradient: linear-gradient(135deg, #2897f3 0%, #1772e6 100%);
+            --purple-banner: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
             --green-banner: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --purple-banner: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
             --border-color: #334155;
         }
 
@@ -24,16 +24,16 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
             padding: 16px;
-            padding-bottom: 90px; /* Navigatsiya uchun bo'shliq */
+            padding-bottom: 90px;
             user-select: none;
         }
 
-        /* Top Bar Tabs */
+        /* Top Toggle Buttons */
         .top-tabs {
             display: flex;
             background: #131c2e;
@@ -52,15 +52,13 @@
             border-radius: 18px;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.2s ease;
         }
         .tab-btn.active {
             background: var(--accent-blue);
             color: white;
-            box-shadow: 0 4px 12px rgba(36, 139, 242, 0.3);
         }
 
-        /* Dynamic Banners */
+        /* Banners */
         .banner {
             border-radius: 16px;
             padding: 14px 16px;
@@ -68,19 +66,17 @@
             font-size: 14px;
             font-weight: 500;
             line-height: 1.4;
-            position: relative;
-            overflow: hidden;
         }
-        .banner-green { background: var(--green-banner); }
-        .banner-purple { background: var(--purple-banner); }
         .banner span {
             display: block;
             font-size: 11px;
             opacity: 0.8;
             margin-top: 4px;
         }
+        .banner-purple { background: var(--purple-banner); }
+        .banner-green { background: var(--green-banner); }
 
-        /* Main Big Feature Card */
+        /* Main Showcase Card */
         .hero-card {
             background: var(--bg-card);
             border-radius: 24px;
@@ -88,16 +84,10 @@
             text-align: center;
             border: 1px solid var(--border-color);
             margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
         .hero-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 16px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 55px;
+            margin-bottom: 16px;
         }
         .hero-title {
             font-size: 22px;
@@ -111,7 +101,7 @@
             line-height: 1.5;
         }
 
-        /* Forms & Inputs */
+        /* Forms */
         .input-box {
             background: #131c2e;
             border: 1px solid var(--border-color);
@@ -129,8 +119,6 @@
             font-size: 15px;
             flex: 1;
         }
-        .input-box input::placeholder { color: #576574; }
-
         .inline-action {
             background: rgba(36, 139, 242, 0.15);
             color: var(--accent-blue);
@@ -142,7 +130,7 @@
             cursor: pointer;
         }
 
-        /* iOS List Tiers */
+        /* Item Selection Lists */
         .tier-list {
             padding: 0;
             margin: 0;
@@ -159,14 +147,15 @@
             align-items: center;
             font-weight: 600;
             font-size: 15px;
-            transition: transform 0.1s ease;
-            cursor: pointer;
         }
-        .tier-item:active { transform: scale(0.98); background: #223147; }
-        .tier-item .amount { display: flex; align-items: center; gap: 8px; }
-        .tier-item .price { color: var(--text-main); background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
+        .tier-item.clickable { cursor: pointer; }
+        .tier-item .price {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
 
-        /* Action Buttons */
         .action-btn {
             background: var(--accent-gradient);
             color: white;
@@ -177,11 +166,9 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(36, 139, 242, 0.4);
         }
-        .action-btn:active { opacity: 0.9; }
 
-        /* Bottom Tab Navigation */
+        /* Navigation menu */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -210,17 +197,15 @@
         .nav-item.active { color: var(--accent-blue); }
         .nav-icon { font-size: 20px; }
 
-        /* Utils */
         .screen { display: none; }
         .screen.active { display: block; }
+        
         .back-link {
             color: var(--accent-blue);
             font-size: 15px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
             margin-bottom: 16px;
             cursor: pointer;
+            display: inline-block;
         }
         .file-upload-label {
             display: block;
@@ -237,11 +222,13 @@
 </head>
 <body>
 
+    <!-- Top Tabs (Stars / Premium) -->
     <div id="top-tabs-container" class="top-tabs">
         <button id="tab-stars" class="tab-btn active" onclick="switchMode('stars')">Stars</button>
         <button id="tab-premium" class="tab-btn" onclick="switchMode('premium')">Premium</button>
     </div>
 
+    <!-- MAIN STARS SCREEN -->
     <div id="scr-stars" class="screen active">
         <div class="banner banner-purple">
             Endi Uzum Bank orqali ham
@@ -249,8 +236,8 @@
         </div>
         <div class="hero-card">
             <div class="hero-icon">⭐</div>
-            <h2 class="hero-title">Telegram Stars olish</h2>
-            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Stars balansini to'ldiring — qulay to'lov usullari va hatto naqd pul bilan ham.</p>
+            <h2 class="hero-title">Starsio Stars</h2>
+            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Stars balansini to'ldiring — qulay to'lov usullari va tezkor yetkazib berish.</p>
             <div class="input-box">
                 <input type="text" id="stars-username" placeholder="@username kiriting...">
                 <button class="inline-action" onclick="fillMe('stars-username')">O'zimga</button>
@@ -259,6 +246,7 @@
         </div>
     </div>
 
+    <!-- MAIN PREMIUM SCREEN -->
     <div id="scr-premium" class="screen">
         <div class="banner banner-green">
             Naqd pul bilan ham olishingiz mumkin
@@ -266,59 +254,56 @@
         </div>
         <div class="hero-card">
             <div class="hero-icon">💙</div>
-            <h2 class="hero-title">Telegram Premium</h2>
-            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Premium obuna.</p>
+            <h2 class="hero-title">Starsio Premium</h2>
+            <p class="hero-desc">O'zingiz yoki yaqinlaringiz uchun Telegram Premium obunasi.</p>
             <button class="action-btn" onclick="showPremiumTiers()">Premium olish</button>
         </div>
     </div>
 
+    <!-- REFERRAL & RATING SYSTEM SCREEN -->
+    <div id="scr-referral" class="screen">
+        <div class="hero-card" style="padding: 20px; text-align: left;">
+            <h2 class="hero-title" style="text-align: center; margin-bottom: 4px;">Referral Tizimi</h2>
+            <p class="hero-desc" style="text-align: center;">Har bir taklif qilingan do'stingiz uchun **+1 ball** oling!</p>
+            
+            <div style="background: #131c2e; border-radius: 14px; padding: 15px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <span style="font-size: 13px; color: var(--text-muted);">Sizning ballaringiz</span>
+                <div style="font-size: 32px; font-weight: bold; color: #f59e0b; margin: 5px 0;" id="ref-score-val">0</div>
+                <input type="text" id="ref-link-input" readonly style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; margin-top: 8px;" value="Yuklanmoqda...">
+                <button class="inline-action" style="margin-top: 10px; width: 100%; padding: 10px;" onclick="copyRefLink()">Havolani nusxalash</button>
+            </div>
+
+            <h3 style="margin-bottom: 12px; font-size: 16px;">🏆 Umumiy Reyting (Top taklifchilar)</h3>
+            <ul class="tier-list" id="rating-render-area">
+                <li class="tier-item"><div style="color: var(--text-muted)">Yuklanmoqda...</div></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- STARS TIERS SELECTION -->
     <div id="scr-stars-tiers" class="screen">
         <div class="back-link" onclick="goBack('scr-stars')">‹ Ortga</div>
         <h3 style="margin-bottom:16px;">To'plamni tanlang</h3>
         <ul class="tier-list" id="stars-render-area"></ul>
     </div>
 
+    <!-- PREMIUM TIERS SELECTION -->
     <div id="scr-premium-tiers" class="screen">
         <div class="back-link" onclick="goBack('scr-premium')">‹ Ortga</div>
-        <h3 style="margin-bottom:16px;">Obuna turini tanlang</h3>
-        <ul class="tier-list">
-            <li class="tier-item" onclick="openPremiumSubform('Telegram Premium (O\'ziga)', [
-                {label: '1 oy obuna', cost: 41990, title: 'Premium 1 Oy'},
-                {label: '12 oy obuna (Chegirma)', cost: 294990, title: 'Premium 12 Oy'}
-            ], false)">
-                <div class="amount">💎 Shaxsiy obuna (In-App)</div>
-                <div>›</div>
-            </li>
-            <li class="tier-item" onclick="openPremiumSubform('Gift Premium (Sog\'g\'a)', [
-                {label: '3 oy Premium Sovg\'a', cost: 165990, title: 'Gift Premium 3 Oy'},
-                {label: '6 oy Premium Sovg\'a', cost: 224990, title: 'Gift Premium 6 Oy'},
-                {label: '12 oy Premium Sovg\'a', cost: 394990, title: 'Gift Premium 12 Oy'}
-            ], true)">
-                <div class="amount">🎁 Sovg'a tariqasida (Gift)</div>
-                <div>›</div>
-            </li>
-        </ul>
+        <h3 style="margin-bottom:16px;">Muddatni tanlang</h3>
+        <ul class="tier-list" id="premium-render-area"></ul>
     </div>
 
-    <div id="scr-dynamic-subtiers" class="screen">
-        <div class="back-link" onclick="goBack('scr-premium-tiers')">‹ Ortga</div>
-        <h3 id="dynamic-tier-title" style="margin-bottom:16px;">Muddatni tanlang</h3>
-        <div id="dynamic-username-block" class="input-box" style="display:none;">
-            <input type="text" id="premium-gift-user" placeholder="@username kiriting...">
-            <button class="inline-action" onclick="fillMe('premium-gift-user')">O'zimga</button>
-        </div>
-        <ul class="tier-list" id="dynamic-render-area"></ul>
-    </div>
-
+    <!-- CHECKOUT VIEW -->
     <div id="scr-checkout" class="screen">
         <div class="back-link" id="checkout-back-hook">‹ Ortga</div>
         <div class="hero-card" style="text-align:left; padding:20px;">
             <h3 style="margin-top:0; text-align:center;">To'lov bo'limi</h3>
-            <p id="checkout-meta" style="font-size:14px; color:var(--text-muted); line-height:1.6; border-bottom:1px solid var(--border-color); padding-bottom:12px;"></p>
+            <p id="checkout-meta" style="font-size:14px; color:var(--text-muted); line-height:1.6; border-bottom:1px solid var(--border-color); padding-bottom:12px; white-space: pre-line;"></p>
             
             <div style="text-align:center; padding:15px 0;">
                 <span style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">KARTA RAQAMI</span>
-                <div style="font-size:22px; font-weight:bold; letter-spacing:1px; color:white;" id="card-display">5614 6828 8568 7642</div>
+                <div style="font-size:22px; font-weight:bold; color:white;" id="card-display">5614 6828 8568 7642</div>
                 <button class="inline-action" style="margin-top:8px;" onclick="copyCardNum()">Nusxalash</button>
                 <div style="font-size:14px; color:var(--text-muted); margin-top:8px;">Matlabov Saidisaxon</div>
             </div>
@@ -332,6 +317,7 @@
         </div>
     </div>
 
+    <!-- STATUS TRACKING -->
     <div id="scr-status" class="screen">
         <div class="hero-card">
             <div class="hero-icon" id="status-icon">⏳</div>
@@ -341,17 +327,18 @@
         </div>
     </div>
 
+    <!-- BOTTOM APP NAVIGATION -->
     <div class="bottom-nav">
-        <button class="nav-item active" id="nav-home" onclick="switchMode('stars')">
-            <span class="nav-icon">⭐</span>Tez Star
+        <button class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+            <span class="nav-icon">⭐</span>Starsio
         </button>
-        <button class="nav-item" onclick="alert('Tez orada...')">
+        <button class="nav-item" id="nav-ref" onclick="navigateTo('referral')">
             <span class="nav-icon">👥</span>Referral
         </button>
         <button class="nav-item" onclick="alert('Hamyon hozircha faol emas')">
             <span class="nav-icon">💼</span>Hamyon
         </button>
-        <button class="nav-item" onclick="alert('Tariq bo\'sh')">
+        <button class="nav-item" onclick="alert('Tarix bo\'sh')">
             <span class="nav-icon">🕒</span>Tarix
         </button>
     </div>
@@ -362,27 +349,50 @@
         tg.ready();
 
         const REPLIT_HOST = "https://d2ec0b89-bc7d-45d1-a016-57d6904008b1-00-2x1s0wvp9le2k.sisko.replit.dev";
+        const currentUserId = tg.initDataUnsafe?.user?.id || "DEBUG_USER";
 
         let orderDraft = {};
         let uiStack = [];
         let encodedReceipt = null;
 
+        // Narxlar yangilandi: 1 Star = 220 so'm
         const starPricing = [
-            {qty: 50, price: 12999},
-            {qty: 100, price: 25999},
-            {qty: 500, price: 129999},
-            {qty: 1000, price: 255000},
-            {qty: 5000, price: 1250000}
+            {qty: 50, price: 50 * 220},
+            {qty: 100, price: 100 * 220},
+            {qty: 250, price: 250 * 220},
+            {qty: 500, price: 500 * 220},
+            {qty: 1000, price: 1000 * 220},
+            {qty: 5000, price: 5000 * 220}
         ];
+
+        // Premium narxlari eski xato holatidan sizning gaplaringizga moslab sozlandi
+        const premiumPricing = [
+            {months: "3 oy", price: 159999, label: "3 oy obuna (-20%)"},
+            {months: "6 oy", price: 219999, label: "6 oy obuna (-37%)"},
+            {months: "1 yil", price: 389999, label: "1 yil obuna (-42%)"}
+        ];
+
+        function navigateTo(tab) {
+            document.getElementById('nav-home').classList.toggle('active', tab === 'home');
+            document.getElementById('nav-ref').classList.toggle('active', tab === 'referral');
+            
+            if (tab === 'home') {
+                switchMode('stars');
+            } else if (tab === 'referral') {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('scr-referral').classList.add('active');
+                document.getElementById('top-tabs-container').style.display = 'none';
+                loadReferralData();
+            }
+        }
 
         function switchMode(mode) {
             document.getElementById('tab-stars').classList.toggle('active', mode === 'stars');
             document.getElementById('tab-premium').classList.toggle('active', mode === 'premium');
             document.getElementById('scr-stars').classList.toggle('active', mode === 'stars');
             document.getElementById('scr-premium').classList.toggle('active', mode === 'premium');
-            document.getElementById('nav-home').classList.toggle('active', true);
-            uiStack = [];
             document.getElementById('top-tabs-container').style.display = 'flex';
+            uiStack = [];
         }
 
         function fillMe(targetFieldId) {
@@ -397,7 +407,6 @@
         function viewTransition(targetScreenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(targetScreenId).classList.add('active');
-            
             const showTop = ['scr-stars', 'scr-premium'].includes(targetScreenId);
             document.getElementById('top-tabs-container').style.display = showTop ? 'flex' : 'none';
         }
@@ -416,8 +425,8 @@
             
             starPricing.forEach(tier => {
                 const li = document.createElement('li');
-                li.className = 'tier-item';
-                li.innerHTML = `<div class="amount">⭐ ${tier.qty.toLocaleString()} Stars</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
+                li.className = 'tier-item clickable';
+                li.innerHTML = `<div>⭐ ${tier.qty.toLocaleString()} Stars</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
                 li.onclick = () => {
                     orderDraft = { type: 'Stars', amount: tier.qty, price: tier.price, username: user };
                     triggerCheckout('scr-stars-tiers');
@@ -430,36 +439,23 @@
         }
 
         function showPremiumTiers() {
-            uiStack.push('scr-premium');
-            viewTransition('scr-premium-tiers');
-        }
-
-        function openPremiumSubform(categoryTitle, subTiers, requiresUsername) {
-            document.getElementById('dynamic-tier-title').innerText = categoryTitle;
-            const userBlock = document.getElementById('dynamic-username-block');
-            userBlock.style.display = requiresUsername ? 'flex' : 'none';
-            
-            const container = document.getElementById('dynamic-render-area');
+            const container = document.getElementById('premium-render-area');
             container.innerHTML = '';
-
-            subTiers.forEach(sub => {
+            
+            premiumPricing.forEach(tier => {
                 const li = document.createElement('li');
-                li.className = 'tier-item';
-                li.innerHTML = `<div class="amount">💎 ${sub.label}</div><div class="price">${sub.cost.toLocaleString()} so'm</div>`;
+                li.className = 'tier-item clickable';
+                li.innerHTML = `<div>💎 Premium - ${tier.months}</div><div class="price">${tier.price.toLocaleString()} so'm</div>`;
                 li.onclick = () => {
-                    let targetUser = "In-App Account";
-                    if(requiresUsername) {
-                        targetUser = document.getElementById('premium-gift-user').value.trim();
-                        if(!targetUser) { alert("Iltimos, sovg'a yuboriladigan foydalanuvchi username'sini yozing!"); return; }
-                    }
-                    orderDraft = { type: 'Premium', title: sub.title, price: sub.cost, username: targetUser };
-                    triggerCheckout('scr-dynamic-subtiers');
+                    const clientUser = tg.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '@no_username';
+                    orderDraft = { type: 'Premium', title: tier.label, price: tier.price, username: clientUser };
+                    triggerCheckout('scr-premium-tiers');
                 };
                 container.appendChild(li);
             });
 
-            uiStack.push('scr-premium-tiers');
-            viewTransition('scr-dynamic-subtiers');
+            uiStack.push('scr-premium');
+            viewTransition('scr-premium-tiers');
         }
 
         function triggerCheckout(backScreenHook) {
@@ -467,8 +463,8 @@
             document.getElementById('checkout-back-hook').onclick = () => goBack(backScreenHook);
 
             const metaStr = orderDraft.type === 'Stars' ? 
-                `Xizmat turi: Telegram Stars\nMiqdori: ⭐ ${orderDraft.amount} Stars\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}` :
-                `Xizmat turi: Telegram Premium Obuna\nPaket: ${orderDraft.title}\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}`;
+                `Xizmat turi: Starsio Stars\nMiqdori: ⭐ ${orderDraft.amount} Stars\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}` :
+                `Xizmat turi: Starsio Premium\nPaket: ${orderDraft.title}\nTo'lov miqdori: ${orderDraft.price.toLocaleString()} so'm\nManzil: ${orderDraft.username}`;
             
             document.getElementById('checkout-meta').innerText = metaStr;
             document.getElementById('upload-label-text').innerText = "📁 To'lov chekini yuklash (Rasm)";
@@ -484,6 +480,13 @@
             alert("Karta raqami nusxalandi!");
         }
 
+        function copyRefLink() {
+            const linkInput = document.getElementById('ref-link-input');
+            linkInput.select();
+            navigator.clipboard.writeText(linkInput.value);
+            alert("Sizning referral havolangiz nusxalandi!");
+        }
+
         function processFile(elem) {
             if(elem.files && elem.files[0]) {
                 document.getElementById('upload-label-text').innerText = "✅ Chek muvaffaqiyatli yuklandi!";
@@ -493,6 +496,33 @@
                 };
                 stream.readAsDataURL(elem.files[0]);
             }
+        }
+
+        function loadReferralData() {
+            // Replit'dan referral va reyting ma'lumotlarini olish
+            fetch(`${REPLIT_HOST}/api/referral?user_id=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('ref-score-val').innerText = data.score;
+                document.getElementById('ref-link-input').value = data.referral_link;
+                
+                const container = document.getElementById('rating-render-area');
+                container.innerHTML = '';
+                
+                if(data.leaderboard && data.leaderboard.length > 0) {
+                    data.leaderboard.forEach((lead, idx) => {
+                        const li = document.createElement('li');
+                        li.className = 'tier-item';
+                        li.innerHTML = `<div>${idx + 1}. ${lead.username || 'Foydalanuvchi'}</div><div style="color:#f59e0b;">🔥 ${lead.score} ball</div>`;
+                        container.appendChild(li);
+                    });
+                } else {
+                    container.innerHTML = '<li class="tier-item"><div style="color: var(--text-muted)">Hozircha reyting bo\'sh</div></li>';
+                }
+            })
+            .catch(() => {
+                document.getElementById('ref-link-input').value = "Ulanishda xato yuz berdi...";
+            });
         }
 
         function dispatchOrder() {
@@ -509,7 +539,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    user_id: tg.initDataUnsafe?.user?.id || "DEBUG_USER",
+                    user_id: currentUserId,
                     init_data: tg.initData,
                     order: orderDraft,
                     receipt: encodedReceipt
@@ -520,13 +550,13 @@
                 if(data.success) {
                     monitorOrderStatus(data.order_id);
                 } else {
-                    alert("Buyurtma yuborishda muammo yuz berdi. Qayta urining.");
+                    alert("Buyurtma yuborishda muammo yuz berdi.");
                     btn.innerText = "To'lovni tasdiqlash";
                     btn.disabled = false;
                 }
             })
             .catch(() => {
-                alert("Backend ulanish xatosi. Replit serveri ochiqligini tekshiring.");
+                alert("Backend ulanish xatosi.");
                 btn.innerText = "To'lovni tasdiqlash";
                 btn.disabled = false;
             });
